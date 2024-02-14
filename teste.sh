@@ -232,6 +232,8 @@ which ip
 which cut
 which sort
 which mkdir
+which rsync
+
 
 which smartctl
 
@@ -418,7 +420,7 @@ mkdir -p "$local_da_imagem_da_particao"
 clear
 
 echo "
-Gerando relatórios sobre esse HW...
+Gerando relatórios sobre esse hardware...
 "
 sleep 2
 
@@ -445,7 +447,59 @@ inxi -v7azy > "$local_da_imagem_da_particao"/inxi.txt
 
 # https://forum.manjaro.org/t/very-unstable-system/126455/25
 
+echo "
+Para sistema/hardware que reiniciar aleatoriamente com bastante frequência.
 
+Você precisa examinar os logs dos segundos antes da reinicialização, não depois. 
+
+Os logs do dmesg têm  data e hora: [0.000000] ocorre na reinicialização, então 
+mostrar informações antes da reinicialização, é útil.
+
+Tente olhar o final de um dmesg anterior: /var/log/dmesg.log.0. Veja também /var/log/syslog. 
+
+
+
+Os motivos mais comuns para reinicializações inesperadas e não registradas são hardware: 
+Superaquecimento ou morte de fontes de alimentação.
+
+
+Interpretando a leitura de logs de erros do dmesg:
+" > $local_da_imagem_da_particao/dmesg.txt
+
+dmesg | grep -i "error\|warn\|fail" >> $local_da_imagem_da_particao/dmesg.txt
+
+# https://forums.linuxmint.com/viewtopic.php?t=227444
+
+
+
+
+
+sleep 2
+clear
+
+echo "
+=== INFORMAÇÕES ===
+
+Partição que será clonada => $ClonarParticao
+
+Sistema de arquivo da partição $ClonarParticao => $sistema_de_arquivo
+Local onde será salvo a imagem da partição $ClonarParticao => $local_da_imagem_da_particao
+
+
+Dispositivo de origem
+
+Fabricante:           $(smartctl -i $ClonarParticao | grep "Model Family:"     | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+Modelo:               $(smartctl -i $ClonarParticao | grep "Device Model:"     | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+Número de série:      $(smartctl -i $ClonarParticao | grep "Serial Number:"    | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+Versão do firmware:   $(smartctl -i $ClonarParticao | grep "Firmware Version:" | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+Capacidade:           $(smartctl -i $ClonarParticao | grep "User Capacity:"    | cut -d: -f2 | sed  "s/[[:space:]]\+//g" | cut -d[ -f2 | sed 's/]//')
+Taxa de rotação:      $(smartctl -i $ClonarParticao | grep "Rotation Rate:"    | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+O suporte SMART está: $(smartctl -i $ClonarParticao | grep "SMART support is:" | sed -n '2p' | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+
+" | tee $local_da_imagem_da_particao/SMART.log
+
+
+# https://www.hostgator.com.br/blog/como-usar-o-comando-tee-do-linux/
 
 
 
@@ -875,6 +929,99 @@ Ex: sdc1 " dispositivo
 
 umount /dev/$dispositivo
 
+
+
+# Adiciona uma opção para verificar a saúde do HD
+
+# Para verificar rapidamente o S.M.A.R.T. status de integridade do dispositivos. Você precisa do 
+# smartctl instalado em seu sistema para que esta parte do script funcione, e seus discos rígidos 
+# precisam ter S.M.A.R.T. ativado.
+
+
+# Para ativar o suporte SMART => # smartctl --smart=on /dev/device
+
+smartctl --info /dev/"$dispositivo" | grep 'SMART support is:'
+
+
+saude_do_HD=$(smartctl -H /dev/"$dispositivo" | grep : | cut -d: -f2 | sed 's/ //g')
+
+if [[ "$saude_do_HD" == "PASSED" ]]; then
+
+echo "HD OK"
+
+else
+
+echo "HD com problema"
+
+exit 
+ 
+fi
+
+# https://wiki.archlinux.org/title/S.M.A.R.T.
+
+
+
+
+# Busca no diretorio /dev os dispositivos (pode será falso positivo)
+
+echo "
+Para verificar todas as unidades sata e nvme
+
+Fornece informações para saber se alguma das unidades está com dificuldades e precisa ser substituída. 
+
+A primeira etapa é coletar os dados
+
+Aqui está um exemplo de resultado disso:
+
+" > $local_da_imagem_da_particao/smartcheck.txt
+
+
+ for drive in /dev/sd[a-z] /dev/sd[a-z][a-z] /dev/nvme[0-9]n[0-9]
+do
+  if [[ ! -e $drive ]]; then continue ; fi
+
+  echo -n "$drive "            >> $local_da_imagem_da_particao/smartcheck.txt
+  echo -e "\n"                 >> $local_da_imagem_da_particao/smartcheck.txt
+
+  smart=$(
+    smartctl -i $drive  | grep Serial  
+    smartctl -A $drive  | grep -E "^  "9"" | awk -F" " '{ print $2,$10 }'
+    smartctl -A $drive  | grep -E "^  "5"" | awk -F" " '{ print $2,$10 }'  
+    smartctl -A $drive  | grep -E "Current_Pending_Sector" | awk -F" " '{ print $2,$10 }'
+    smartctl -A $drive  | grep -E "Offline_Uncorrectable"  | awk -F" " '{ print $2,$10 }'
+)
+
+  echo -e "$smart\n"           >> $local_da_imagem_da_particao/smartcheck.txt
+  
+  
+done 
+
+
+# Resultado:
+
+# /dev/sda  
+# 
+# Serial Number:    45L3GXHAS
+# Power_On_Hours 63584
+# Reallocated_Sector_Ct 0
+# Current_Pending_Sector 0
+# Offline_Uncorrectable 0
+# 
+# /dev/sdb 
+
+
+
+# /dev/sdc 
+
+
+
+
+
+# https://www.reddit.com/r/zfs/comments/11nxm8n/working_bash_script_to_check_smarts_on_all_sata/
+# https://unix.stackexchange.com/questions/121767/run-smartctl-on-all-disks-of-a-server
+
+
+
 echo "
 Ponto de montagem:
 "
@@ -893,7 +1040,24 @@ read -p "
 Informe o ponto de montagem para o dispositivo identificado como /dev/$dispositivo para montar.
 Ex: /mnt/ " ponto_de_montagem
 
+
+
+sistema_de_arquivo_do_windows=$(lsblk -o KNAME,TYPE,FSTYPE,SIZE,LABEL | grep "$dispositivo"  | awk '{print $3}')
+
+if [ "$sistema_de_arquivo_do_windows" == "ntfs" ]; then
+
+
+# mount -t ntfs-3g -o dmask=0077,umask=0177 /dev/$dispositivo  $ponto_de_montagem
+
+mount -t ntfs-3g /dev/$dispositivo  $ponto_de_montagem
+
+
+else
+
+
 mount /dev/$dispositivo  $ponto_de_montagem
+
+
 
 if [ $? -eq 0 ]; then
  
@@ -912,15 +1076,139 @@ else
 
 echo "
 Ocorreu problema ao montar o dispositivo /dev/$dispositivo em $ponto_de_montagem
+
+
+
 "
+
+fi
+
+
+
+# Problemas ao tentar montar HD externo
+# =====================================
+
+
+# $ sudo mount /dev/sdc1 /mnt/hd_externo/
+# ntfs_attr_pread_i: ntfs_pread failed: Erro de entrada/saída
+# Failed to read NTFS $Bitmap: Erro de entrada/saída
+# NTFS is either inconsistent, or there is a hardware fault, or it's a
+# SoftRAID/FakeRAID hardware. In the first case run chkdsk /f on Windows
+# then reboot into Windows twice. The usage of the /f parameter is very
+# important! If the device is a SoftRAID/FakeRAID then first activate
+# it and mount a different device under the /dev/mapper/ directory, (e.g.
+# /dev/mapper/nvidia_eahaabcc1). Please see the 'dmraid' documentation
+# for more details.
+
+
+# NTFSFIX retorna:
+
+# $ sudo ntfsfix /dev/sdc1
+# Mounting volume... Failed to write lock '/dev/sdc1': Resource temporarily unavailable
+# Error opening '/dev/sdc1': Resource temporarily unavailable
+# FAILED
+# Attempting to correct errors... Failed to write lock '/dev/sdc1': Resource temporarily unavailable
+# Error opening '/dev/sdc1': Resource temporarily unavailable
+# FAILED
+# Failed to startup volume: Resource temporarily unavailable
+# Failed to write lock '/dev/sdc1': Resource temporarily unavailable
+# Error opening '/dev/sdc1': Resource temporarily unavailable
+# Volume is corrupt. You should run chkdsk.
+
+# Já tentei o chkdsk no Windows e também não resolveu.
+
+
+# No utilitário Discos, ele dá as seguintes informações adicionais:
+# 
+# Modelo: TOSHIBA MQ01ABD100(AX001U)
+# Tamanho: 1,0TB (1.000.204.886.016 bytes)
+# Particionamento: Master Boot Record
+# Avaliação: O disco está OK, 264 setores defeituosos (34ºC)
+
+
+
+# Dá uma olhada ps verbse tem erro
+
+# dmesg --level=emerg, crit,err | grep /dev/sdc1
+
+
+# HD tem alguma criptografia nas partições.
+
+
+# https://www.vivaolinux.com.br/topico/Hard-on-Linux/Problemas-ao-tentar-montar-HD-externo
+
+
+
+
+# Erro ao montar partição NTFS (Ubuntu 13.04 em dual boot com o Windows 8)
+
+
+# Porém ao tentar entrar na partição NTFS onde estão os meus arquivos aparece a seguinte mensagem de erro:
+
+# Não foi possível acessar "Volume 322 GB"
+
+# Error mounting /dev/sda4 at /media/juliano/B49A63719A632F54: Command-line `mount -t "ntfs" -o "uhelper=udisks2,nodev,nosuid,uid=1000,gid=1000,dmask=0077,fmask=0177" "/dev/sda4" "/media/juliano/B49A63719A632F54"' 
+# exited with non-zero exit status 14: The disk contains an unclean file system (0, 0).
+# Metadata kept in Windows cache, refused to mount.
+# Failed to mount '/dev/sda4': Operation not permitted
+# The NTFS partition is in an unsafe state. Please resume and shutdown
+# Windows fully (no hibernation or fast restarting), or mount the volume
+# read-only with the 'ro' mount option.
+
+
+# O Windows 8 utiliza um recurso parecido com a hibernação, que serve para agilizar sua próxima inicialização. O problema disso é que, como é indicado pelo mount, é 
+# perigoso mexer na partição enquanto ela possui esse estado de hibernação. Sugiro então que busque uma forma de desativar isso no windows.
+
+
+# Rode o comando ntfsfix como root no linux com a partição do windows desmontada.
+#
+# "Você pode executar ntfsfix em um volume NTFS, se você acha que foi danificado pelo Windows ou alguma outra forma e não pode ser montado."
+#
+# http://linux.die.net/man/8/ntfsfix
+#
+# Após esse comando, feche normalmente o linux e inicie o windows que ele vai para o modo de correção para verificar a consistência do sistema e corrigir.
+
+
+# Quando desliga a máquina no Windows, na verdade ela só hiberna. Para resolver, liga o Windows 8 e desliga via prompt de comando: shutdown /s
+
+# A máquina vai desligar, agora quando iniciar o Linux, irá conseguir acessar a partição do Windows normalmente.
+
+# Basta lembrar sempre de reiniciar o Windows, ou desligar pelo prompt, para que ele não deixei a montagem da sua partição em cache.
+
+
+# Uma possível solução é desabilitar a inicialização rápida do Windows
+
+# https://antoniomedeiros.dev/blog/2015/09/16/como-desativar-a-inicializacao-rapida-do-windows/
+# https://github.com/vinyanalista
+
+
+
+# Quando iniciar o pc entre no windows para desativar a sua hibernação:
+
+# Entre no prompt de comando como administrador:
+
+# Digite esse comando :
+
+# powercfg -h off e pressione enter.
+
+
+
+# https://www.vivaolinux.com.br/topico/Ubuntu-e-Kubuntu/Erro-ao-montar-particao-NTFS
+# http://social.technet.microsoft.com/wiki/pt-br/contents/articles/13657.desativando-hibernacao-no-windows-8.aspx
+
+
+
+
+sleep 40
+clear
 
 exit 
  
 fi
 
 
-sleep 5s
 echo "================================================"
+
 ;;
 
 
@@ -1501,6 +1789,21 @@ cmd
 
 chkdsk d: /f
 
+
+
+Recomendações antes da clonagem de Windows com muito tempo de uso no hardware:
+
+- Verificar se o HD/SSD esta muito fragmentado caso desfragmentar usando o proprio programa nativo do Windows.
+- Verificar a saúde do HD
+- Verificar por virus
+- Anotar a chave de ativação do Windows
+- Verificar o HD/SSD com chkdsk Ex: chkdsk c: /f
+- Remover os programas inuteis que estão instalados
+- Fazer uma limpeza/faxina no Windows usandos os programas nativos dele ou um arquivo .bat
+- Verificar se existe algum drive com conflito no sistema
+- Verificar se falta algum drive no sistema
+- Verificar se tem problema de falta de dlls
+- Verificar por atualizações (instalar o pacote de atualização [SP1, SP2, SP3...] sem o acesso a internet)
 
 "
                 
