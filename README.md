@@ -2,9 +2,39 @@
 
 ## Informações: <br>
 
-$ chmod +x teste.sh <br>
-$ ./teste.sh -h <br> <br>
+```sh
+$ chmod +x teste.sh
+$ ./teste.sh -h
+```
 
+## Dependências <br>
+
+* partclone >= 0.2.77
+* dd
+* sfdisk
+* gunzip
+* cat
+* dmidecode
+* lshw
+* parted
+* gparted ou cfdisk
+* mount
+* ntfs-3g
+* ntfsfix
+* sed
+* bc
+* smartctl
+* inxi
+* lsblk
+* lspci
+* split
+* cut
+* sort
+* fdisk
+* umount
+* date
+* mkdir
+ 
 ## ISO do Linux em modo live usando o script <br>
 ![](https://github.com/tuxslack/teste/blob/slackware/VirtualBox_windows%2010%20pro_13_02_2024_04_35_44.png)
 
