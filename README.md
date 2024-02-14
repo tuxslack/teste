@@ -50,3 +50,17 @@ $ ./teste.sh -h
 ## Imagem clonada e restaura do Windows 10: <br>
 ![](https://github.com/tuxslack/teste/blob/slackware/VirtualBox_windows%2010%20pro_13_02_2024_04_16_29.png)
 
+<br>
+<br>
+<br>
+<br>
+<br>
+
+## Tabela onde o scritp funcionou:
+<br>
+
+| Sistema     | Versão | Testado em |
+| ---      | ---       | ---       |
+| Windows 10 Pro 64 bit | 10.0 - compilação 10240         | Máquina virtual usando o programa VirtualBox |
+|      |         |        |
+
