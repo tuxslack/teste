@@ -1,4 +1,9 @@
-# teste
+# Script usado no sysresccd para clonar e restaurar imagem de sistema (Windows 10 Pro).
+
+## Informações: <br>
+
+$ chmod +x teste.sh <br>
+$ ./teste.sh -h <br> <br>
 
 ## ISO do Linux em modo live usando o script <br>
 ![](https://github.com/tuxslack/teste/blob/slackware/VirtualBox_windows%2010%20pro_13_02_2024_04_35_44.png)
