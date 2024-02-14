@@ -42,6 +42,11 @@ $ ./teste.sh -h
 ## ISO do Linux em modo live usando o script: <br>
 ![](https://github.com/tuxslack/teste/blob/slackware/VirtualBox_windows%2010%20pro_13_02_2024_04_35_44.png)
 
+[Download do SystemRescue](https://www.system-rescue.org/Download/)
+
+<br>
+<br>
+
 ## Gerando uma imagem do sistema: <br>
 ![](https://github.com/tuxslack/teste/blob/slackware/VirtualBox_windows%2010%20pro_12_02_2024_20_08_21.png)
 
