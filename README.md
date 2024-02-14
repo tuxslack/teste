@@ -6,34 +6,38 @@
 $ chmod +x teste.sh
 $ ./teste.sh -h
 ```
+> [!CAUTION]
+> **Obs:** Use esse script com cautela. <br> <br>
+>  O uso inadequado ou a inserção de valores incorretos podem apagar, destruir ou substituir os dados no disco rígido. <br> <br>
 
-## Dependências: <br>
-
-* partclone >= 0.2.77
-* dd
-* sfdisk
-* gunzip
-* cat
-* dmidecode
-* lshw
-* parted
-* gparted ou cfdisk
-* mount
-* ntfs-3g
-* ntfsfix
-* sed
-* bc
-* smartctl
-* inxi
-* lsblk
-* lspci
-* split
-* cut
-* sort
-* fdisk
-* umount
-* date
-* mkdir
+> [!NOTE]
+> ## Dependências: <br>
+>
+> * partclone >= 0.2.77
+> * dd
+> * sfdisk
+> * gunzip
+> * cat
+> * dmidecode
+> * lshw
+> * parted
+> * gparted ou cfdisk
+> * mount
+> * ntfs-3g
+> * ntfsfix
+> * sed
+> * bc
+> * smartctl
+> * inxi
+> * lsblk
+> * lspci
+> * split
+> * cut
+> * sort
+> * fdisk
+> * umount
+> * date
+> * mkdir
  
 ## ISO do Linux em modo live usando o script: <br>
 ![](https://github.com/tuxslack/teste/blob/slackware/VirtualBox_windows%2010%20pro_13_02_2024_04_35_44.png)
@@ -59,7 +63,7 @@ $ ./teste.sh -h
 ## Tabela onde o scritp funcionou:
 <br>
 
-| Sistema     | Versão | Testado em |
+| Sistema     | Versão | Testado em: |
 | ---      | ---       | ---       |
 | Windows 10 Pro 64 bit | 10.0 - compilação 10240         | Máquina virtual usando o programa VirtualBox |
 |      |         |        |
