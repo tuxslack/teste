@@ -2,6 +2,7 @@
 
 
 ################################################################
+#
 # Script_Name: ypartclone.sh
 #
 # Description: Eu preciso de uma ferramenta que eu possa criar uma imagem de partição do sistema instalado de modo que eu possa usá-la em outro HD em outra Máquina.
@@ -13,6 +14,9 @@
 # 
 # partclone - O utilitário para clonar e restaurar uma partição.
 #
+
+# Clona a partição numa imagem junto com a MBR (.mbr) e tabela de partição (.sf) para uma futura restauração de imagem em um HD de mesma capacidade.
+
 
 
 # Clonar partições do HD no Linux
@@ -202,6 +206,7 @@ fi
 
 # Dependencies:
 
+which split
 which gparted
 which cfdisk
 which dmidecode
@@ -216,13 +221,21 @@ which gpart
 which testdisk
 which fdisk
 which mount
+which umount
 which date
 which ntfs-3g
 which setxkbmap
 which ntfsfix 
 which bc
 which sed
+which ip
+which cut
+which sort
+which mkdir
 
+which smartctl
+
+which inxi
 
 # O comando gdisk no Linux é similar ao fdisk e permite manipular e criar partições. Ele foi especialmente criado para lidar com partições GPT.
 # Este novo esquema de tabela de alocação de partições foi criado para funcionar com os novos firmwares das placas-mãe EFI e UEFI.
@@ -405,7 +418,7 @@ mkdir -p "$local_da_imagem_da_particao"
 clear
 
 echo "
-Gerando relatórios sobre o HW...
+Gerando relatórios sobre esse HW...
 "
 sleep 2
 
@@ -427,6 +440,10 @@ parted -ls > "$local_da_imagem_da_particao"/sda-pt.parted
 #   -s, --script                    nunca pede intervenção do usuário
 
 
+
+inxi -v7azy > "$local_da_imagem_da_particao"/inxi.txt
+
+# https://forum.manjaro.org/t/very-unstable-system/126455/25
 
 
 
@@ -1461,19 +1478,20 @@ echo "
 Reparar HD NTFS (ntfs-3g)
 
 
-ntfsfix /dev/<device name>
+# ntfsfix /dev/<device name>
 
 
 O comando funciona apenas na partição desmontada. a partir do windows 8, a configuração de inicialização rápida deve ser desativada, 
 caso contrário hd não é montado em modo de escrita o que bloqueia qualquer função de reparo. se tudo der certo aparecera 
 isso no console:
 
-# sudo ntfsfix /dev/sda6
+# ntfsfix /dev/sda6
 Mounting volume... OK
 Processing of $MFT and $MFTMirr completed successfully.
 Checking the alternate boot sector... OK
 NTFS volume version is 3.1.
 NTFS partition /dev/sda6 was processed successfully.
+
 
 
 Hiren's Boot  (versão live do windows)
