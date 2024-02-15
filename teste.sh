@@ -100,6 +100,15 @@
 # https://github.com/free-educa/books/blob/main/books/Livro%20de%20Entendendo%20e%20Dominando%20o%20Linux.pdf
 
 
+
+# Qual o sistema de arquivo do Mac - Apple File System (APFS)?
+#
+# APFS é um sistema de arquivos criado pela Apple para as versões mais modernas do macOS. Ele t
+# ambém é utilizado nos sistemas operacionais dos outros produtos da empresa, como iOS, IpadOS, 
+# watchOS e tvOS. Saiba mais sobre o APFS e quais benefícios ele traz para o seu dispositivo Apple.
+
+
+
 # ==========================================================================================
 
 # Variaveis global:
@@ -108,6 +117,14 @@
 # Arquivo de log
 
 log="/tmp/partclone.log"
+
+
+descricao="Script de manutenção de sistema"
+versao="versão 0.2"
+autor="Fernando Souza"
+data="Janeiro de 2024"
+# site1="YouTube - @fernandosuporte"
+site="https://www.youtube.com/@fernandosuporte/videos"
 
 
 # ==========================================================================================
@@ -305,15 +322,16 @@ Precauções
 
 # Verificar Root
 
-if ! [ $(id -u) = 0 ]; then echo "Por favor, execute este script como SUDO ou ROOT!" ; exit ; fi
+# if ! [ $(id -u) = 0 ]; then echo "Por favor, execute este script como SUDO ou ROOT!" && yad --title="" --on-top --center --timeout=30 --text="Por favor, execute este script como SUDO ou ROOT!"  ; exit ; fi
+
 
 # ==========================================================================================
 
 echo
 /bin/echo -e "\e[1;36m#----------------------------------------------------#\e[0m"
-/bin/echo -e "\e[1;36m#   Script de manutenção de sistema - versão 0.2     #\e[0m"
-/bin/echo -e "\e[1;36m#   Escrito por Fernando - Janeiro de 2024           #\e[0m"
-/bin/echo -e "\e[1;36m#   https://www.youtube.com/@fernandosuporte/videos  #\e[0m"
+/bin/echo -e "\e[1;36m#   $descricao - $versao     #\e[0m"
+/bin/echo -e "\e[1;36m#   Escrito por $autor - $data     #\e[0m"
+/bin/echo -e "\e[1;36m#   $site  #\e[0m"
 /bin/echo -e "\e[1;36m#----------------------------------------------------#\e[0m"
 echo
 
@@ -1234,7 +1252,7 @@ verificar
 
 # Idioma do sistema
 
-locale -a
+# locale -a
 
 
 if [ $LANG == "pt_BR.UTF-8" ]; then
@@ -2258,12 +2276,242 @@ done
           
             ;; 
             
+
+
+
+        --gui)
+        
+# ==========================================================================================
+
+
+
+
+# Verificar se o Yad, o xterm  e o xfce4-terminal estão instalado no sistema.
+
+which yad 1> /dev/null || exit
+
+which xfce4-terminal 1> /dev/null || exit
+
+which xterm 1> /dev/null || exit
+
+
+# Termina o comprimento e a altura da tela do xfce4-terminal
+
+altura="50"
+comprimento="150"
+
+
+
+# Mostra o menu na tela, com as ações disponíveis
+
+opcao=$(yad --list --radiolist --title "ypartclone" \
+--text "O que deseja fazer?" \
+--column "Opção" --column "Descrição" \
+false "Clonar sistema" \
+false "Restaurar sistema" \
+false "Ajuda" \
+false "Sair" \
+--button=Cancelar:1 --button=ok:0  \
+--width="540" --height="300" 2>/dev/null )
+
+
+
+# Se apertar CANCELAR ou ESC, então vamos sair...
+[ $? -ne 0 ]
+
+# De acordo com a opção escolhida, dispara programas
+# opcao=$(echo $opcao | egrep -o '^[0-3]')
+# case "$opcao" in
+
+
+# ==========================================================================================
+
+# Clonar sistema
+
+if echo "$opcao" | grep $"Clonar sistema" 1>/dev/null  ; then
+
+# clear
+
+
+
+# xfce4-terminal -H -e "bash -c \"$0 --clonar\""
+
+xfce4-terminal  --title="Clonar - Parclone" -e "bash -c \"$0 --clonar\"" --geometry "${comprimento}x${altura}"
+
+
+# --color-text=red
+# --color-bg=green
+# --maximize
+
+
+
+# A versão 1.1.1 do xfce4-terminal não possui opção de centralizar a tela. 
+#
+#
+# Para centralizar a tela do xfce4-terminal, você pode seguir os seguintes passos:
+# 
+# 1. Abra o xfce4-terminal.
+# 2. No menu superior do xfce4-terminal, clique em "Editar" e selecione "Preferências".
+# 3. Nas preferências do xfce4-terminal, selecione a aba "Aparência".
+# 4. No painel "Estilo de janela", localize a opção "Posição" e escolha a opção "Centro".
+# 5. Clique em "Fechar" para salvar as alterações.
+# 
+# Dessa forma, a próxima vez que você abrir o xfce4-terminal, ele será exibido no centro da tela.
+# 
+# ou
+# 
+# Para centralizar a tela do xfce4-terminal pela linha de comando, você pode usar as seguintes etapas:
+# 
+# 1. Abra o terminal xfce4-terminal.
+# 2. Execute o seguinte comando para centralizar a tela:
+# 
+# 
+# xfconf-query -c xfce4-terminal -p /misc/geometry/centered -s true
+# 
+# 
+# Dessa forma, a tela do xfce4-terminal será centralizada automaticamente.
+
+
+
+
+
+# xterm -e "$0 --clonar"
+
+
+
+# https://forum.xfce.org/viewtopic.php?id=12642
+# https://askubuntu.com/questions/980720/open-xfce-terminal-window-and-run-command-in-same-window
+# https://docs.gtk.org/gdk3/method.RGBA.parse.html
+# https://bbs.archlinux.org/viewtopic.php?id=279430
+# https://unix.stackexchange.com/questions/30234/how-to-set-custom-default-size-for-new-xfce-terminal-windows
+
+
+fi
+
+# ==========================================================================================
+
+# Restaurar sistema
+
+if echo "$opcao" | grep $"Restaurar sistema" 1>/dev/null  ; then
+
+
+# clear
+
+
+xfce4-terminal  --title="Restaurar - Parclone" -e "bash -c \"$0 --restaurar\"" --geometry "${comprimento}x${altura}"
+
+
+# xterm -e "$0 --restaurar"
+
+
+fi
+
+# ==========================================================================================
+
+# Ajuda
+
+if echo "$opcao" | grep $"Ajuda" 1>/dev/null  ; then
+
+# clear
+
+
+rm -Rf /tmp/ajuda.log
+
+
+$0 --ajuda > /tmp/ajuda.log
+
+
+# Eliminar o intervalo entre as linhas 1 e 6:
+
+sed -i '1,6d' /tmp/ajuda.log
+
+
+# Inserir linha no início do arquivo
+
+
+# Link de site não é adicionado ao arquivo /tmp/ajuda.log usando o sed
+
+# Resultado: sed: -e expressão #1, caractere 62: opção desconhecida para o comando `s' (s///?)
+
+# O erro ocorre porque o sed estava usando o delimitador "/" que também esta incluindo no "link" a adicionar no arquivo, 
+# isso faz com que o sed interprete o "/" como o delimitador ao invés de velo como um caractere de texto.
+
+
+sed -i "1s/^/                                                                                                                     \n/"  /tmp/ajuda.log
+sed -i "2s/^/           #--------------------------------------------------------------------------------------------------------#\n/"  /tmp/ajuda.log
+sed -i "3s/^/           #                                                                                                        #\n/"  /tmp/ajuda.log
+sed -i "4s/^/           #                               $descricao - $versao                             #\n/"  /tmp/ajuda.log
+sed -i "5s/^/           #                               Escrito por $autor - $data                             #\n/"  /tmp/ajuda.log
+sed -i "6s|^|           #                               $site                          #\n |"  /tmp/ajuda.log
+sed -i "7s/^/           #                                                                                                        #\n/"  /tmp/ajuda.log
+sed -i "8s/^/           #--------------------------------------------------------------------------------------------------------#\n/"  /tmp/ajuda.log
+
+
+# Substitui a palavra "$descricao" pelo conteudo da variavel $descricao somente na linha 6
+
+# E possível trocar o delimitador do comando sed por outra coisa, no caso o "|". 
+
+# sed -i "6s|site|$site|" /tmp/ajuda.log
+
+# http://www.zago.eti.br/script/sed.html
+
+
+# Usar "aspas duplas" para usar o sed com variavel.
+
+# https://pt.linux-console.net/?p=12008
+# https://www.vivaolinux.com.br/topico/Shell-Script/sed-com-variavel
+
+
+
+yad --title "Ajuda" --center --text-info --fore=green --filename=/tmp/ajuda.log  --width=1100 --height=1000 2>/dev/null 
+
+rm -Rf /tmp/ajuda.log
+
+
+# xterm -e "$0 --ajuda ; sleep 10"
+
+
+# http://smokey01.com/yad/
+# http://ti1.free.fr/index.php/yad-creer-des-fenetres-pour-des-scripts-bash/
+# https://yad-guide.ingk.se/text/yad-text.html
+# https://br.ccm.net/faq/8483-sed-excluir-uma-ou-mais-linhas-de-um-arquivo
+# https://www.vivaolinux.com.br/topico/Shell-Script/Apagar-linha-especifica-em-arquivo
+# https://terminalroot.com.br/2015/07/30-exemplos-do-comando-sed-com-regex.html
+# https://www.ime.usp.br/~batista/sed_ptBR.html
+# https://www.vivaolinux.com.br/topico/Sed-Awk-ER-Manipulacao-de-Textos-Strings/METACARACTERES-NO-SED-DANDO-DOR-DE-CABECA
+
+
+fi
+
+# ==========================================================================================
+
+# Sair do script
+
+if echo $opcao | grep $"Sair" ; then
+
+clear
+
+exit
+
+
+fi
+
+# ==========================================================================================
+
+
+clear
+        
+            ;;
             
+
+        
+                    
         --ajuda|--help|-h)
         
           echo "
                 Use: $0 --clonar|-c           para clonar HD;
                 Use: $0 --restaurar|-r        para restaurar uma imagem do sistema para o HD;
+                Use: $0 --gui                 Abre o script usando o Yad.                  
                 Use: $0 --ajuda|--help|-h     mostra essa tela.                    
                 "
 echo "
@@ -2365,6 +2613,7 @@ Recomendações antes da clonagem de Windows com muito tempo de uso no hardware:
                 
             ;;
             
+            
             *) 
                echo -e "$1: Opção desconhecida.\n\nUse: $0 --ajuda|--help|-h\n\n"
             
@@ -2373,4 +2622,6 @@ Recomendações antes da clonagem de Windows com muito tempo de uso no hardware:
     esac
 
 
+
+exit 0
 
