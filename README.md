@@ -1,11 +1,22 @@
 # Script usado no sysresccd para clonar e restaurar imagem de sistema (Windows 10 Pro).
 
-## Informações: <br>
+## Informações: <br>  <br>
+
+Uso:  <br>
 
 ```sh
 $ chmod +x teste.sh
 $ ./teste.sh -h
 ```
+ou  <br>
+Instalação: <br>
+
+```sh
+# mv -i ~/Downloads/teste.sh  /usr/local/bin/
+# chmod +x /usr/local/bin/teste.sh
+# teste.sh -h ou teste.sh --gui
+```
+
 > [!CAUTION]
 > **Obs:** Use esse script com cautela. <br> <br>
 >  O uso inadequado ou a inserção de valores incorretos podem apagar, destruir ou substituir os dados no disco rígido. <br> <br>
