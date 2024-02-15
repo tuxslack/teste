@@ -100,6 +100,22 @@
 # https://github.com/free-educa/books/blob/main/books/Livro%20de%20Entendendo%20e%20Dominando%20o%20Linux.pdf
 
 
+# ==========================================================================================
+
+# Variaveis global:
+
+
+# Arquivo de log
+
+log="/tmp/partclone.log"
+
+
+# ==========================================================================================
+
+
+
+
+
 clear
 
 
@@ -204,7 +220,7 @@ fi
 
 # ==========================================================================================
 
-# Dependencies:
+# Dependências:
 
 which split
 which gparted
@@ -289,7 +305,7 @@ Precauções
 
 # Verificar Root
 
-# if ! [ $(id -u) = 0 ]; then echo "Por favor, execute este script como SUDO ou ROOT!" ; exit 1 ; fi
+if ! [ $(id -u) = 0 ]; then echo "Por favor, execute este script como SUDO ou ROOT!" ; exit ; fi
 
 # ==========================================================================================
 
@@ -319,6 +335,7 @@ verificar
  
         
           echo "Clonar HD"
+
 
 
 
@@ -352,14 +369,81 @@ verificar
 
 
 
+
+
+
+
+
+# Para identifica os discos
+
 echo "
 Dispositivo localizados:
 "
 
-fdisk -l | grep /dev/sd | grep Disk  | awk '{print $2}'| sort  | cut -d: -f1 
+
+# fdisk -l | grep /dev/sd | awk '{print $1 " " $5 " " $7}' > /tmp/particao.log
+
+# fdisk -l | grep /dev/sd  > /tmp/particao.log
+
+
+
+# fdisk -l | grep Disco | awk '{print $2}'| sort  | cut -d: -f1 
+
+
+fdisk -l | grep /dev/sd | grep Disk  | awk '{print $2}'| sort  | cut -d: -f1     2>> "$log"
 # fdisk -l | grep /dev/sd | grep Disco | awk '{print $2}'| sort  | cut -d: -f1
 
-lsblk -o KNAME,TYPE,FSTYPE,SIZE,LABEL,UUID,MOUNTPOINT
+# /dev/sdb
+# /dev/sda
+
+# Com o sort organizaremos a saída do comando em ordem crescente.
+
+echo "
+"
+
+lsblk -o KNAME,TYPE,FSTYPE,SIZE,LABEL,UUID,MOUNTPOINT    2>> "$log"
+
+# lsblk -o KNAME,TYPE,FSTYPE,SIZE,LABEL,UUID,MOUNTPOINT > /tmp/particao.log
+
+
+# Trocar TODAS ocorrências de uma palavra por outra palavra
+
+# sed -i '1 s/KNAME/NOME/g'                   /tmp/particao.log
+# sed -i '1 s/TYPE/TIPO/'                     /tmp/particao.log
+# sed -i '1 s/FSTYPE/Sistema/'                /tmp/particao.log
+# sed -i '1 s/SIZE/TAMANHO/g'                 /tmp/particao.log
+# sed -i '1 s/LABEL/RÓTULO/g'                 /tmp/particao.log
+# sed -i '1 s/MOUNTPOINT/PONTO DE MONTAGEM/g' /tmp/particao.log
+
+# "s" substitui um trecho de texto por outro
+# -i  altera o arquivo
+# "g" no final (como se usa o d e p) altera todas as ocorrências
+#  1  Você pode restringir o comando SED para substituir a string em uma linha específica.
+
+
+# Deleta todas as linhas que contém a palavra "Disco" no arquivo
+# sed -i '/Disco/d' /tmp/particao.log
+
+
+# cat /tmp/particao.log
+
+# /dev/sdb1 40,5G Linux
+# /dev/sdb3 425,3G Estendida
+# /dev/sdb5 2G Linux
+# /dev/sdb6 356,4G HPFS/NTFS/exFAT
+
+# https://elias.praciano.com/2017/10/formate-automaticamente-a-saida-dos-seus-comandos-linux-em-tabelas/
+
+
+# rm -Rf /tmp/particao.log
+
+# https://br.ccm.net/faq/8483-sed-excluir-uma-ou-mais-linhas-de-um-arquivo
+# https://terminalroot.com.br/2015/07/30-exemplos-do-comando-sed-com-regex.html
+# http://www.zago.eti.br/script/sed.html
+# https://thobias.org/doc/sosed.html
+# https://raullesteves.medium.com/tratamento-de-texto-pelo-terminal-cat-cut-grep-tr-uniq-short-paste-9f1d7286b3cc
+# https://www.vivaolinux.com.br/topico/Comandos/Comando-Shell-Script-para-retirar-todos-os-numeros-de-um-arquivo-de-texto
+
 
 
 echo "
@@ -375,7 +459,9 @@ clear
 
 echo "
 "
-parted $HD unit MiB print
+parted "$HD" unit MiB print   2>> "$log"
+
+# https://papy-tux.legtux.org/doc1274/index.html
 
 
 echo '
@@ -391,18 +477,29 @@ clear
 
 
 
+# Certifique-se de que ambas as partições estejam desmontadas
+
+# sudo umount $HD{1...9} 2> /dev/null
+
+
 # Certifique-se de que a partição de destino esteja desmontada
 
 clear
 
-umount "$ClonarParticao"  1> /dev/null 2> /dev/null
+umount "$ClonarParticao"  1> /dev/null  2>> "$log"
 
 # Tratamento de erros para o umount
 
 [ $? -eq 0 ] && echo "Partição $ClonarParticao desmontada com sucesso..." ||   { echo -e "\e[00;31mFalha ao desmontar a partição $ClonarParticao \e[00m" ; }
 
 
-sistema_de_arquivo=$(lsblk -rno FSTYPE $ClonarParticao | head -n 1)
+# https://mazer.dev/pt-br/linux/dicas/como-identificar-erro-no-script-shell-interromper/
+
+
+
+# Para identificar o sistema de arquivo da partição
+
+sistema_de_arquivo=$(lsblk -rno FSTYPE "$ClonarParticao" | head -n 1)
 
 
 
@@ -415,7 +512,14 @@ read local_da_imagem_da_particao
 [ -z "$local_da_imagem_da_particao" ] && { echo "O valor não pode ser nulo... Informe um local para salvar a imagem da partição." ; exit ; }
 
 
-mkdir -p "$local_da_imagem_da_particao"
+mkdir -p "$local_da_imagem_da_particao" 2>> "$log"
+
+
+
+
+
+
+
 
 clear
 
@@ -423,6 +527,20 @@ echo "
 Gerando relatórios sobre esse hardware...
 "
 sleep 2
+
+
+# Para imprimir colunas selecionadas de dispositivos de bloco.
+
+lsblk -o KNAME,NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL > "$local_da_imagem_da_particao"/blkdev.list
+
+
+# lsblk --ascii -n -o name,mountpoint
+
+# https://acervolima.com/comando-lsblk-no-linux-com-exemplos/
+# https://elias.praciano.com/2022/05/obtenha-informacoes-dos-seus-sistemas-de-arquivos-com-o-lsblk/
+# https://forums.linuxmint.com/viewtopic.php?t=337961
+
+
 
 dmidecode > "$local_da_imagem_da_particao"/Info-dmi.txt
 lshw      > "$local_da_imagem_da_particao"/Info-lshw.txt
@@ -464,12 +582,16 @@ Superaquecimento ou morte de fontes de alimentação.
 
 
 Interpretando a leitura de logs de erros do dmesg:
-" > $local_da_imagem_da_particao/dmesg.txt
+" > "$local_da_imagem_da_particao"/dmesg.txt
 
-dmesg | grep -i "error\|warn\|fail" >> $local_da_imagem_da_particao/dmesg.txt
+dmesg | grep -i "error\|warn\|fail" >> "$local_da_imagem_da_particao"/dmesg.txt
 
 # https://forums.linuxmint.com/viewtopic.php?t=227444
 
+
+
+
+fdisk -l > "$local_da_imagem_da_particao"/fdisk.txt
 
 
 
@@ -496,12 +618,70 @@ Capacidade:           $(smartctl -i $ClonarParticao | grep "User Capacity:"    |
 Taxa de rotação:      $(smartctl -i $ClonarParticao | grep "Rotation Rate:"    | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
 O suporte SMART está: $(smartctl -i $ClonarParticao | grep "SMART support is:" | sed -n '2p' | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
 
-" | tee $local_da_imagem_da_particao/SMART.log
+" | tee "$local_da_imagem_da_particao"/SMART.log
 
 
 # https://www.hostgator.com.br/blog/como-usar-o-comando-tee-do-linux/
 
 
+
+
+
+
+echo "
+Saúde do HD/SSD
+"
+# smartctl -H  $ClonarParticao
+
+teste=$(smartctl -H  $ClonarParticao | cut -d: -f2 | sed  "s/[[:space:]]\+//g" | sed -n '5p')
+
+# PASSED
+
+if [ "$teste" == "PASSED" ];
+   then
+    echo "O dispositivo $ClonarParticao  esta bom."
+
+# === START OF READ SMART DATA SECTION ===
+# SMART overall-health self-assessment test result: PASSED
+
+
+
+
+# Como saber se HD está em GPT ou MBR no Linux?
+
+
+# sudo parted -ls /dev/sda  | grep "Tabela de partições:" | cut -d: -f2 | sed  "s/[[:space:]]\+//g"
+#
+# Atenção: Não foi possível abrir /dev/sr0 para leitura e escrita (Sistema de arquivos somente para leitura). /dev/sr0 foi aberto somente-leitura.
+# Atenção: O descritor da controladora (driver) informa que o tamanho físico de bloco é 512 bytes, mas o Linux informa que é 2048 bytes.
+# msdos
+# msdos
+# unknown
+
+
+# Tipo de tabela de partição
+
+# Valores "dos" para MBR e valor "gpt" para gpt
+
+# formato_da_tabela_de_particoes=$(fdisk -l  $HD | grep "Tipo de rótulo do disco:"  | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+# dos
+
+
+
+
+
+
+
+# Identificar se esta usando MBR ou GPT no HD/SSD
+
+
+# Há dois principais tipos de tabelas de partição disponíveis: 
+
+# Master Boot Record (MBR)
+# Tabela de Partição GUID (GPT) 
+
+
+# Valores: "msdos" para MBR e "gpt" para gpt
 
 formato_da_tabela_de_particoes=$(parted -s $HD -- print | grep -E '^Partition Table: (gpt|msdos)$' | head -n 1 | sed 's,^Partition Table: \([a-z]\+\)$,\1,' | grep -E '^[a-z]+$')
 # formato_da_tabela_de_particoes=$(parted -s $HD -- print | grep -E '^Tabela de partições: (gpt|msdos)$' | head -n 1 | sed 's,^Tabela de partições: \([a-z]\+\)$,\1,' | grep -E '^[a-z]+$')
@@ -520,7 +700,44 @@ echo "
 Fazendo backup do MBR...
 "
 
-dd if=$HD of=$local_da_imagem_da_particao/sda-mbr  bs=512 count=1
+# Tanto o gerenciador de boot quanto a tabela de particionamento do HD são salvos no primeiro setor do HD, a famosa trilha MBR, que contém apenas 512 bytes. Destes, 
+# 446 bytes são reservados para o setor de boot, enquanto os outros 66 bytes guardam a tabela de partição.
+
+# Ao trocar de sistema operacional, você geralmente subscreve a MBR com um novo gerenciador de boot, mas a tabela de particionamento só é modificada ao criar ou deletar 
+# partições. Se por acaso os 66 bytes da tabela de particionamento forem subscritos ou danificados, você perde acesso a todas as partições do HD. O HD fica parecendo vazio, 
+# como se tivesse sido completamente apagado. Para evitar isso, você pode fazer um backup da trilha MBR do HD. Assim você vai poder recuperar tudo caso ocorra qualquer 
+# eventualidade. Para isso, use o comando:
+
+
+# Para fazer o backup do MBR, basta copiar para um arquivo os primeiros 512 bytes do disco:
+
+dd if=$HD of=$local_da_imagem_da_particao/sda-mbr  bs=512 count=1  2>> "$log"
+
+
+# Este comando faz uma cópia do setor de boot do HD, aqueles primeiros 512 bytes de extrema importância onde fica instalado o gerenciador de boot.
+
+
+# dd if=/dev/sda of=/home/partimag/Windows_Pro_8.1-29-10-2018-img/sda-hidden-data-after-mbr skip=1 bs=512 count=2047
+
+
+# https://www.hardware.com.br/dicas/fazendo-backup-recuperando-mbr-tabela-particoes.html
+# https://antoniomedeiros.dev/blog/2012/04/21/problemas-envolvendo-bootloaders-mbr-e-tabela-de-particoes/
+# https://wiki.archlinux.org/title/Partitioning_(Portugu%C3%AAs)
+# https://wiki.archlinux.org/title/Dd_(Portugu%C3%AAs)
+
+
+
+# Deletou a TABELA de partição acidentalmente com GPARTED? 
+
+
+# Para recuperar os arquivos use TestDisk ou Minitool Power Data Recovery, tem a função do Gparted para resgatar dados.
+
+
+# Como a tabela de partições ocupa os últimos 66 bytes da MBR, podemos preservar esta informação, variando a sintaxe do comando dd:
+
+# dd if=mbr-backup of=/dev/sda bs=446 count=1
+
+# dd if=/dev/sda of=tabela.mbr bs=66 skip=446 count=1
 
 
 echo "
@@ -529,20 +746,51 @@ Fazendo backup da tabela de partições...
 Sempre tenha backup dos dados num hd externo.
 "
 
+
 nome_da_tabela_de_particao=$(echo "$HD" | cut -d/ -f3)
 
-sfdisk -d $HD > $local_da_imagem_da_particao/$nome_da_tabela_de_particao.sf
+sfdisk -d "$HD" > "$local_da_imagem_da_particao"/$nome_da_tabela_de_particao.sf  2>> "$log"
+
+
+# Este segundo faz uma cópia da tabela de partição do HD. Se você restaurar estes dois arquivos num HD limpo, 
+# ele ficará particionado exatamente da mesma forma que o primeiro. Se depois disto você restaurar também as 
+# imagens das partições, ficará com uma cópia idêntica de todo o conteúdo do HD. O HD destino não precisa 
+# necessariamente ser do mesmo tamanho que o primeiro, ele pode ser maior (neste caso o excedente ficará 
+# vago e você poderá criar novas partições depois). Ele só não pode ser menor que o original, caso contrário 
+# você vai ficar com um particionamento inválido e dados faltando ou seja, uma receita para o desastre.
+
+
+
+# https://www.hardware.com.br/tutoriais/usando-partimage/
+# https://www.certificacaolinux.com.br/backup-do-mbr-com-o-comando-dd/
+# https://www.clubedohardware.com.br/forums/topic/594026-dicas-para-tentar-recuperar-arquivos-perdidos-poste-aqui-uma-solu%C3%A7%C3%A3ofuncional/
+# https://cleuber.com.br/index.php/2014/04/26/tabelas-de-particao-do-hd-mbr-ou-gpt-qual-a-diferenca
+# https://www.vivaolinux.com.br/topico/Hard-on-Linux/Deletou-a-TABELA-de-particao-acidentalmente-com-GPARTED
 
 
 
    
    elif [ $formato_da_tabela_de_particoes == "gpt" ];
    then
+   
    echo "
    gpt
    " 
    
+   
+# sgdisk
+
+# https://askubuntu.com/questions/386752/fixing-corrupt-backup-gpt-table
+# https://www.cyberciti.biz/faq/linux-backup-restore-a-partition-table-with-sfdisk-command/
+# https://wiki.archlinux.org/title/GPT_fdisk
+# https://sites.google.com/site/inforlae/erro-clonezilla-gpt-e-mbr
+# https://www.vivaolinux.com.br/dica/This-disk-contains-mismatched-GPT-and-MBR-partition-devsda-RESOLVIDO
+# http://www.zago.eti.br/hdclone.txt
+
+
+   
   else
+  
   
    clear
    
@@ -554,7 +802,42 @@ sleep 10
 
 exit 
 
+
 fi
+
+
+# https://www.vivaolinux.com.br/topico/Iniciantes-no-Linux/gpt-ou-mbr-1
+# https://pt.linux-console.net/?p=18117
+# https://www.hardware.com.br/comunidade/uefi-ubuntu/1479251/
+
+
+
+
+
+
+
+
+
+
+# Formatos suportados dos sistema de arquivo:
+
+# btrfs
+# ext2
+# ext3
+# ext4
+# hfs+
+# extfs
+# exfat
+# f2fs
+# nilfs2
+# fat
+# fat12
+# fat16
+# fat32
+# vfat
+# ntfs
+# hfsplus 
+# hfsp
 
 
 
@@ -574,12 +857,14 @@ if [ "$sistema_de_arquivo" == "btrfs" ];
    then
    echo "ext4"
 
+
 # Clonar uma partição para uma imagem
 
   
 # partclone.ext4 -d -c -s /dev/sda1 -o sda1.img
 
 # partclone.ext4 -c -s /dev/sda1 -o ~/image_sda1.pcl
+
 
 # partclone.ext4 -z 10485760 -N -L /var/log/partclone.log -c -s /dev/sda6 --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - /home/partimag/Windows_Pro_8.1-29-10-2018-img/sda6.ext4-ptcl-img.gz. 2> /tmp/split_error.myDx3Z
 
@@ -589,6 +874,27 @@ if [ "$sistema_de_arquivo" == "btrfs" ];
 # Note: For maximum compression use gzip -c9
 
 # https://forum.manjaro.org/t/partclone-how-to-use-compression/53767
+
+
+
+# Crie o arquivo de imagem:
+
+# sudo partclone.ext4 -c -d -s $ClonarParticao -o clone.img
+
+
+# Com opções:
+
+# -c para selecionar a clonagem de partição para imagem
+#  d, -s, -o para selecionar respectivamente a depuração, -s a origem, -o o destino
+
+#  O arquivo de imagem é menor que o sistema de arquivos da partição original (305 MiB versus 976 MiB) e um pouco maior que a parte usada da partição (296 MiB versus 257 MiB)
+
+# ls -lh clone.img 
+# -rw------- 1 root root 305M 1º de junho 09:48 clone.img 
+
+# sudo df -BM /dev/sdb1 
+# Sys. de 1 milhão de arquivos de bloco usados, uso disponível% montado em 
+# /dev/sdb1 976M 257M 653M 29% /mnt
 
 
 
@@ -639,11 +945,14 @@ if [ "$sistema_de_arquivo" == "btrfs" ];
    
 # Clonar uma partição para uma imagem
    
-   partclone.ntfs -z 10485760 -N -L /var/log/partclone.log -c -s $ClonarParticao --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - $local_da_imagem_da_particao/$(echo "$ClonarParticao" | cut -d/ -f3).ntfs-ptcl-img.gz. 2>> /tmp/split_error.$(date +%d-%m-%Y)
+   partclone.ntfs -z 10485760 -N -L /var/log/partclone.log -c -s "$ClonarParticao" --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - "$local_da_imagem_da_particao"/$(echo "$ClonarParticao" | cut -d/ -f3).ntfs-ptcl-img.gz. 2>> "$log"
+   
+
 
 # partclone.ntfs -z 10485760 -N -L /var/log/partclone.log -c -s /dev/sda1 --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - /home/partimag/Windows_Pro_8.1-29-10-2018-img/sda1.ntfs-ptcl-img.gz. 2> /tmp/split_error.ZHntnZ
 # partclone.ntfs -z 10485760 -N -L /var/log/partclone.log -c -s /dev/sda2 --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - /home/partimag/Windows_Pro_8.1-29-10-2018-img/sda2.ntfs-ptcl-img.gz. 2> /tmp/split_error.KZnreP
 # partclone.ntfs -z 10485760 -N -L /var/log/partclone.log -c -s /dev/sda5 --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - /home/partimag/Windows_Pro_8.1-29-10-2018-img/sda5.ntfs-ptcl-img.gz. 2> /tmp/split_error.1WuQgs
+
 
 
 # partclone.ntfs -d -c -s /dev/sda2 -o sda2.img
@@ -665,7 +974,7 @@ if [ "$sistema_de_arquivo" == "btrfs" ];
    clear
    
    echo -e "\e[00;31m
-   O dispositivo $ClonarParticao possui um formato não suportado pelo Partclone.
+   O dispositivo $ClonarParticao possui um formato de sistema de arquivo não suportado pelo Partclone.
    \e[00m"
 
 sleep 10
@@ -673,6 +982,108 @@ sleep 10
 exit 
 
 fi
+
+
+
+# ==========================================================================================
+
+
+# Para o caso de quer clonar outra partição do HD/SSD
+
+clear
+
+echo -n "Deseja clonar outra partição? [s/n]"
+read reps
+
+if [ "$reps" == "s" ];
+then
+
+
+# Loop para gerar varias imagens de partições do HD/SSD
+
+    while [ "$reps" != "n" ];
+    do
+
+clear
+
+echo "
+"
+parted "$HD" unit MiB print
+
+# https://papy-tux.legtux.org/doc1274/index.html
+
+  
+echo '
+Qual a partição do HD/SSD que gostaria de clonar? Ex: '$HD'2'
+read ClonarParticao
+
+
+clear
+
+# Verificar se a variavel $ClonarParticao é nula
+
+[ -z "$ClonarParticao" ] && { echo "O valor não pode ser nulo... Informe uma partição para ser clonada." ;  break ; }
+
+
+
+umount "$ClonarParticao"  1> /dev/null  2>> "$log"
+
+# Tratamento de erros para o umount
+
+[ $? -eq 0 ] && echo "Partição $ClonarParticao desmontada com sucesso..." ||   { echo -e "\e[00;31mFalha ao desmontar a partição $ClonarParticao \e[00m" ; }
+
+
+
+
+# Clonar uma partição para uma imagem
+   
+   partclone."$sistema_de_arquivo" -z 10485760 -N  -L /var/log/partclone.log -c -s "$ClonarParticao" --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - "$local_da_imagem_da_particao"/$(echo "$ClonarParticao" | cut -d/ -f3)."$sistema_de_arquivo"-ptcl-img.gz. 2>> "$log"
+   
+   
+sleep 1
+clear
+
+echo -n "Deseja clonar outra partição? [s/n]"
+read reps
+        
+        if [ "$reps" == "n" ];
+        then
+            echo "Continuando..."
+            break
+        fi
+        
+    done
+    
+# Fim do loop
+
+    
+fi
+
+# https://www.vivaolinux.com.br/topico/Shell-Script/Problemas-para-sair-do-loop-While
+
+
+
+# ==========================================================================================
+
+
+
+
+
+
+
+echo "
+Todos os dispositivos reconhecido pelo sistema que possui o sistema de arquivo $sistema_de_arquivo
+" >> "$log"
+
+blkid -t TYPE="$sistema_de_arquivo" -s TYPE -s UUID -s PARTUUID >> "$log"
+# /dev/sdb6: UUID="1B11A4B347B6EDF1" TYPE="ntfs" PARTUUID="8fc1ffee-06"
+# /dev/sda2: UUID="984C07B54C078D66" TYPE="ntfs" PARTUUID="b2ceef40-02"
+# /dev/sda1: UUID="584804274804068A" TYPE="ntfs" PARTUUID="b2ceef40-01"
+
+
+# https://forum.manjaro.org/t/manjaro-wont-boot-after-update-cant-switch-tty/145462/44
+
+
 
 
 
@@ -691,24 +1102,91 @@ fi
 # Uso do Partclone:
 #
 # -c , --clone =>  Salve a partição no formato de imagem especial.
-# -s  ARQUIVO  =>  Arquivo fonte. O ARQUIVO pode ser um arquivo de imagem (feito por partclone) ou dispositivo dependendo de sua ação. Normalmente, a fonte de backup é o dispositivo, a fonte de restauração é o arquivo de imagem.
-# -o  ARQUIVO  =>  Arquivo de saída. O ARQUIVO pode ser um arquivo de imagem (o partclone irá gerar) ou depende do dispositivo em sua ação. Normalmente, faça backup da saída para um arquivo de imagem e restaure a saída para o dispositivo.
+#
+# -s  ARQUIVO  =>  Arquivo fonte. O ARQUIVO pode ser um arquivo de imagem (feito por partclone) ou dispositivo dependendo de sua ação. Normalmente, a 
+#                  fonte de backup é o dispositivo, a fonte de restauração é o arquivo de imagem.
+#
+# -o  ARQUIVO  =>  Arquivo de saída. O ARQUIVO pode ser um arquivo de imagem (o partclone irá gerar) ou depende do dispositivo em sua ação. Normalmente, 
+#                  faça backup da saída para um arquivo de imagem e restaure a saída para o dispositivo.
+#
 # -d nível     =>  Defina o nível de depuração [1|2|3]
 
 
+  
+  
    
 
 echo  "
 Copiando o arquivo de log gerado para a pasta $local_da_imagem_da_particao
 "
 
-cp /var/log/partclone.log $local_da_imagem_da_particao/
-             
+# cp /var/log/partclone.log $local_da_imagem_da_particao/   2>> "$log"
+ 
+         
+rsync -av /var/log/partclone.log "$local_da_imagem_da_particao"/   2>> "$log"
+
+# https://sobrelinux.info/questions/163716/whats-the-difference-between-cp-and-rsync
+
+
+# Copia o arquivo de log para a pasta "$local_da_imagem_da_particao"
+
+rsync -av "$log"  "$local_da_imagem_da_particao"/ 
+
+ 
+# https://www.hardware.com.br/comunidade/tr-substituir/869489/
+# https://terminalroot.com.br/2015/07/30-exemplos-do-comando-sed-com-regex.html
+# https://www.vivaolinux.com.br/topico/Comandos/Print-de-palavras-especificas-de-uma-linha
+# https://www.devmedia.com.br/introducao-ao-shell-script-no-linux/25778
+# https://www.truenas.com/community/threads/smart-self-assessment-test-result-failed-but-tests-are-passing.95890/
+# https://www.linuxquestions.org/questions/linux-newbie-8/smartctl-read-failure%3B-is-my-hd-failing-920243/
+# https://www.vivaolinux.com.br/dica/Adicionando-cor-ao-comando-echo
+# https://papy-tux.legtux.org/doc1274/index.html
+
+
+
+# blk_label() { lsblk -rno LABEL "$1" | head -n 1 ; }
+# blk_uuid() { lsblk -rno UUID "$1" | head -n 1 ; }
+# blk_uuids() { lsblk -rno UUID "$1" ; }
+# blk_type() { lsblk -rno TYPE "$1" | head -n 1 ; }
+
+# blk_logsectors() { lsblk -rno LOG-SEC "$1" | head -n 1 ; }
+# ls_part_of_disk() { lsblk -rno KNAME,TYPE "$1" | grep 'part$' | grep -E -o '^\S+' | sed 's,^,/dev/,g' ; }
+
+
+
+
+  else
+  
+   clear
+   
+   echo -e "\e[00;31m
+   O dispositivo $ClonarParticao  esta com problema e não pode ser gerado uma imagem dele.
+   
+   É aconselhado fazer um backup dos seus dados e substituir o disco.
+   \e[00m"
+   
+   
+# === START OF READ SMART DATA SECTION ===
+# SMART overall-health self-assessment test result: FAILED!
+# Drive failure expected in less than 24 hours. SAVE ALL DATA.
+# No failed Attributes found.
+
+
+exit 
+
+
+fi
+
+  
           
             ;;
             
+            
         --restaurar|-r)
-          echo "Restaurar uma imagem para o HD"
+        
+          echo "
+          Restaurar uma imagem para o HD/SSD
+          "
           
 
 
@@ -770,6 +1248,10 @@ Dispositivos localizados:
 "
 dispositivos_localizados=$(fdisk -l | grep /dev/sd | grep Disco | awk '{print $2}' | sort  | cut -d: -f1)
 
+# fdisk -l | grep Disco | awk '{print $2}'| sort  | cut -d: -f1 
+# /dev/sda
+# /dev/sdb
+
 
 elif [ $LANG == "en_US.UTF-8" ];then
 
@@ -780,13 +1262,17 @@ System language: $LANG
 echo "
 Devices located:
 "  
+
 dispositivos_localizados=$(fdisk -l | grep /dev/sd | grep Disk  | awk '{print $2}' | sort  | cut -d: -f1)
+   
+# fdisk -l | grep Disk | awk '{print $2}'| sort  | cut -d: -f1 
+
    
 else
 
 echo "
 Sem suporte ao idioma: $LANG
-"
+" | tee  "$log"
 
 exit
 
@@ -807,8 +1293,9 @@ fi
 
 
 
+# Para identifica os discos:
 
-echo $dispositivos_localizados
+echo "$dispositivos_localizados"
 
  
 echo "
@@ -816,7 +1303,7 @@ echo "
 
 lsblk -o KNAME,TYPE,FSTYPE,SIZE,LABEL,UUID,MOUNTPOINT
 
-exit
+
 
 echo "
 Qual o dispositivo que será usado na restauração da imagem? Ex: /dev/sda"
@@ -867,15 +1354,17 @@ clear
 # Menu para as opções:
 
 
-
+# Inicio do loop
 
 while true; do
+
 clear
 echo '================================================
 
 Onde se encontra a imagem que deseja restaurar para '$HD'? 
 
 Ex: /media/backup/clonezilla/Windows_10_Pro-'`date +%d-%m-%Y`'-img
+
 
 
 1) Pasta local
@@ -899,6 +1388,7 @@ clear
 case "$x" in
 
 1) # Pasta local
+
 read -p "Informe o caminho completo da pasta onde esta a imagem: " local_da_imagem_da_particao
 
 
@@ -927,7 +1417,7 @@ read -p "
 Informe o dispositivo para montar.
 Ex: sdc1 " dispositivo
 
-umount /dev/$dispositivo
+umount /dev/"$dispositivo" 2>> "$log"
 
 
 
@@ -951,7 +1441,7 @@ echo "HD OK"
 
 else
 
-echo "HD com problema"
+echo "HD com problema" | tee "$log"
 
 exit 
  
@@ -973,15 +1463,15 @@ A primeira etapa é coletar os dados
 
 Aqui está um exemplo de resultado disso:
 
-" > $local_da_imagem_da_particao/smartcheck.txt
+" > "$local_da_imagem_da_particao"/smartcheck.txt
 
 
  for drive in /dev/sd[a-z] /dev/sd[a-z][a-z] /dev/nvme[0-9]n[0-9]
 do
   if [[ ! -e $drive ]]; then continue ; fi
 
-  echo -n "$drive "            >> $local_da_imagem_da_particao/smartcheck.txt
-  echo -e "\n"                 >> $local_da_imagem_da_particao/smartcheck.txt
+  echo -n "$drive "            >> "$local_da_imagem_da_particao"/smartcheck.txt
+  echo -e "\n"                 >> "$local_da_imagem_da_particao"/smartcheck.txt
 
   smart=$(
     smartctl -i $drive  | grep Serial  
@@ -991,7 +1481,7 @@ do
     smartctl -A $drive  | grep -E "Offline_Uncorrectable"  | awk -F" " '{ print $2,$10 }'
 )
 
-  echo -e "$smart\n"           >> $local_da_imagem_da_particao/smartcheck.txt
+  echo -e "$smart\n"           >> "$local_da_imagem_da_particao"/smartcheck.txt
   
   
 done 
@@ -1049,13 +1539,13 @@ if [ "$sistema_de_arquivo_do_windows" == "ntfs" ]; then
 
 # mount -t ntfs-3g -o dmask=0077,umask=0177 /dev/$dispositivo  $ponto_de_montagem
 
-mount -t ntfs-3g /dev/$dispositivo  $ponto_de_montagem
+mount -t ntfs-3g /dev/"$dispositivo"  "$ponto_de_montagem"    2>> "$log"
 
 
 else
 
 
-mount /dev/$dispositivo  $ponto_de_montagem
+mount /dev/"$dispositivo"  "$ponto_de_montagem"    2>> "$log"
 
 
 
@@ -1068,7 +1558,7 @@ echo "Local: $local_da_imagem_da_particao"
 echo "
 Conteudo da pasta:
 "
-ls -1 $local_da_imagem_da_particao
+ls -1 "$local_da_imagem_da_particao"
 
 break
 
@@ -1079,7 +1569,8 @@ Ocorreu problema ao montar o dispositivo /dev/$dispositivo em $ponto_de_montagem
 
 
 
-"
+" | tee "$log"
+
 
 fi
 
@@ -1291,12 +1782,12 @@ Ex: /mnt/ " ponto_de_montagem
 [ -z "$ponto_de_montagem" ] && { echo "O valor não pode ser nulo... Informe um ponto de montagem para o compartilhamento //$ip/$compartilhamento" ; exit ; }
 
 
-umount "$ponto_de_montagem"
+umount "$ponto_de_montagem" 2>> "$log"
 
 
 # Compartilhamento SAMBA com senha
 
-mount -t cifs "$ip"/"$compartilhamento" "$ponto_de_montagem" -o user=$nome_do_usuario, password=$senha 
+mount -t cifs "$ip"/"$compartilhamento" "$ponto_de_montagem" -o user="$nome_do_usuario", password="$senha"
 
 if [ $? -eq 0 ]; then
  
@@ -1307,7 +1798,7 @@ echo "Local: $local_da_imagem_da_particao"
 echo "
 Conteudo da pasta:
 "
-ls -1 $local_da_imagem_da_particao
+ls -1 "$local_da_imagem_da_particao"
 
 break
 
@@ -1315,7 +1806,9 @@ else
 
 echo "
 Ocorreu problema ao montar o compartilhamento //$ip/$compartilhamento em $ponto_de_montagem
-"
+
+" | tee "$log"
+
 
 sleep 30
 exit
@@ -1411,7 +1904,9 @@ Ex: /mnt/ " ponto_de_montagem
 
 [ -z "$ponto_de_montagem" ] && { echo "O valor não pode ser nulo... Informe um ponto de montagem para o compartilhamento //$ip/$compartilhamento" ; exit ; }
 
-umount "$ponto_de_montagem"
+
+umount "$ponto_de_montagem" 2>> "$log"
+
 
 clear
 
@@ -1426,7 +1921,7 @@ echo "Local: $local_da_imagem_da_particao"
 echo "
 Conteudo da pasta:
 "
-ls -1 $local_da_imagem_da_particao
+ls -1 "$local_da_imagem_da_particao"
 
 break
 
@@ -1434,7 +1929,7 @@ else
 
 echo "
 Ocorreu problema ao montar o compartilhamento NFS (Network File System) $ip:$compartilhamento em $ponto_de_montagem
-"
+" | tee "$log"
 
 sleep 30
 exit
@@ -1475,6 +1970,9 @@ exit 0
 esac
 done
 
+# Fim do loop
+
+
 
 echo "Continuando...."
 
@@ -1491,7 +1989,18 @@ clear
 
 echo "Recuperando a tabela de partições..."
 
-sfdisk –force $HD < "$local_da_imagem_da_particao"/sda.sf
+sfdisk –force "$HD" < "$local_da_imagem_da_particao"/sda.sf  2>> "$log"
+
+
+# Se você tem um HD dividido em duas partições: sda1 e sda2; você precisa fazer imagens das duas partições usando o Partclone, 
+# fazer o backup da mbr e da table de partição usando os comandos acima e, na hora de restaurar, começar copiando os dois 
+# arquivos e só depois recuperar as partições.
+
+# Lembre-se que um jeito fácil de fazer e recuperar os backups é instalar temporáriamente um segundo HD na máquina.
+
+
+# https://www.hardware.com.br/tutoriais/usando-partimage/
+
 
 
 
@@ -1499,8 +2008,13 @@ echo "Restaurar o MBR..."
 
 # Na hora de restaurar os backups, basta acessar a pasta onde estão os arquivos e inverter os comandos, para que eles sejam restaurados:
 
-dd if="$local_da_imagem_da_particao"/sda-mbr of=$HD bs=512 count=1
+dd if="$local_da_imagem_da_particao"/sda-mbr of="$HD" bs=512 count=1  2>> "$log"
 
+
+# dd if=sda-mbr of=/dev/sda bs=512 count=1
+# 1+0 records in
+# 1+0 records out
+# 512 bytes (512 B) copied, 0.0293491 s, 17.4 kB/s
 
 
 
@@ -1519,9 +2033,10 @@ echo "Restaurar imagem usando o partclone (split, gzip) com fonte stdin"
 
 # ----------------------------------------------------------------------------------------
 
+sleep 2
 clear
 
-# array=($(pwd)/pdf/*.gz)
+
 
 array=("$local_da_imagem_da_particao"/*.gz)
 
@@ -1662,13 +2177,21 @@ tamanho_do_destino=$(lsblk -o KNAME,TYPE,FSTYPE,SIZE,LABEL,UUID,MOUNTPOINT | gre
 if [ "$tamanho_do_destino" -gt "$tamanho_da_origem" ]; then
 
     echo "O tamanho do dispositivo de armazenamento de destino é valido para restaurar a imagem."
+    
     sleep 5
     clear
+    
 else
 
     clear
-    echo "O tamanho do dispositivo de armazenamento de destino não pode ser menor do que o tamanho do dispositivo de armazenamento de origem."
+    
+    echo "
+    O tamanho do dispositivo de armazenamento de destino não pode ser menor do que o tamanho do dispositivo de armazenamento de origem.
+    " | tee  "$log"
+    
+    
     exit
+    
 fi
 
 
@@ -1677,7 +2200,7 @@ fi
 
 
 
-cat "$local_da_imagem_da_particao"/$imagem.a* | gunzip -c | partclone.$sistema_de_arquivo -N -d -r -s - -o "$HD"$numero_da_particao
+cat "$local_da_imagem_da_particao"/$imagem.a* | gunzip -c | partclone."$sistema_de_arquivo"  -L /var/log/partclone.log  -N -d -r -s - -o "$HD"$numero_da_particao   2>> "$log"
 
 
 # https://www.vivaolinux.com.br/topico/Shell-Script/Executar-script-com-argumento-sim-ou-nao
@@ -1699,9 +2222,42 @@ done
 # Usar o loop while no lugar do for.
 
 # ----------------------------------------------------------------------------------------
+  
+  
+
+# Obter informações de uma imagem
+	
+# partclone.info -s sda2.img
+
+
+
+# Restaurar uma imagem para partição
+	
+# partclone.ntfs -d -r -s sda2.img -o /dev/sda2
+
+# partclone.ext4 -d -r -s sda1.img -o /dev/sda1
+
+# partclone.ext4 -r -s ~/image_sda1.pcl -o /dev/sda1
+
+
+
+# Restaurar imagem do clonezilla (split, gzip) com fonte stdin
+
+# cat sda1.ext3-ptcl-img.gz.a* | gunzip -c | partclone.ext3 -d -r -s - -o /dev/sda1
+
+
+
+# zcat ~/image_sda1.pcl.gz | partclone.ext4 -r -o /dev/sda1
+
+
+# -r , --restore => Restaure a partição do formato de imagem especial.
+
+  
+  
           
           
             ;; 
+            
             
         --ajuda|--help|-h)
         
