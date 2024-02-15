@@ -8,7 +8,7 @@ Uso:  <br>
 $ chmod +x teste.sh
 $ ./teste.sh -h
 ```
-ou  <br>
+ <br> ou  <br> <br>
 Instalação: <br>
 
 ```sh
