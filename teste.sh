@@ -622,8 +622,31 @@ dmesg | grep -i "error\|warn\|fail" >> "$local_da_imagem_da_particao"/dmesg.txt
 
 
 
+# Vai ajuda na hora de volta a imagem para o HD/SSD (para identifica se a tabela é MBR ou GPT)
 
-fdisk -l > "$local_da_imagem_da_particao"/fdisk.txt
+# fdisk -l  "$HD" | grep "Tipo de rótulo do disco:" | cut -d: -f2 
+# dos
+
+fdisk -l "$HD" > "$local_da_imagem_da_particao"/fdisk.txt
+
+
+
+# fdisk -l  /dev/sdc
+# Disco /dev/sdc: 7,45 GiB, 8004304896 bytes, 15633408 setores
+# Modelo de disco: Cruzer Blade    
+# Unidades: setor de 1 * 512 = 512 bytes
+# Tamanho de setor (lógico/físico): 512 bytes / 512 bytes
+# Tamanho E/S (mínimo/ótimo): 512 bytes / 512 bytes
+# Tipo de rótulo do disco: dos
+# Identificador do disco: 0xd3526add
+# 
+# Dispositivo Inicializar Início      Fim  Setores Tamanho Id Tipo
+# /dev/sdc1                 2048 15632383 15630336    7,5G  7 HPFS/NTFS/exFAT
+
+
+# https://www.dedoimedo.com/computers/partition-table-backup-restore.html
+
+
 
 lsblk > "$local_da_imagem_da_particao"/lsblk.txt
 
@@ -2089,14 +2112,86 @@ clear
 # formato_da_tabela_de_particoes=$(parted -s $HD -- print | grep -E '^Partition Table: (gpt|msdos)$' | head -n 1 | sed 's,^Partition Table: \([a-z]\+\)$,\1,' | grep -E '^[a-z]+$')
 # formato_da_tabela_de_particoes=$(parted -s $HD -- print | grep -E '^Tabela de partições: (gpt|msdos)$' | head -n 1 | sed 's,^Tabela de partições: \([a-z]\+\)$,\1,' | grep -E '^[a-z]+$')
 
+
+# fdisk -l  "$HD" | grep "Tipo de rótulo do disco:" | cut -d: -f2  | sed 's/ //g'
+
+
+
+# Verificar se o arquivo "$local_da_imagem_da_particao/fdisk.txt" existe
+
+if [ -e "$local_da_imagem_da_particao/fdisk.txt" ] ; then
+
 echo "
-Qual o tipo de tabelas de partição da imagem a ser restaurada? [msdos ou gpt]"
+O arquivo $local_da_imagem_da_particao/fdisk.txt existe.
+"
+
+
+# Idioma do sistema
+
+# locale -a
+
+
+if [ $LANG == "pt_BR.UTF-8" ]; then
+
+echo "
+Idioma do sistema: $LANG
+"
+
+
+# BR
+formato_da_tabela_de_particoes=$(cat "$local_da_imagem_da_particao"/fdisk.txt | grep "Tipo de rótulo do disco:" | cut -d: -f2  | sed 's/ //g')
+
+
+elif [ $LANG == "en_US.UTF-8" ];then
+
+echo "
+System language: $LANG
+"
+  
+# US
+formato_da_tabela_de_particoes=$(cat "$local_da_imagem_da_particao"/fdisk.txt | grep "Disk label type:" | cut -d: -f2  | sed 's/ //g')
+
+   
+else
+
+echo "
+Sem suporte ao idioma: $LANG
+" | tee  "$log"
+
+# exit
+
+fi
+
+
+
+echo "Tipo de tabelas de partição da imagem:
+
+$formato_da_tabela_de_particoes
+"
+
+
+else
+
+echo "
+O arquivo $local_da_imagem_da_particao/fdisk.txt não existe.
+"
+
+fi
+ 
+
+
+# https://www.dedoimedo.com/computers/partition-table-backup-restore.html
+# https://www.vivaolinux.com.br/topico/Shell-Script/verificar-se-arquivo-existe
+
+
+echo "
+Qual o tipo de tabelas de partição da imagem a ser restaurada? [dos ou gpt]"
 read formato_da_tabela_de_particoes
 
-if [ "$formato_da_tabela_de_particoes" == "msdos" ];
+if [ "$formato_da_tabela_de_particoes" == "dos" ];
    then
    echo "
-   msdos
+   dos
    "
 
 
