@@ -2115,7 +2115,8 @@ sfdisk –force "$HD" < "$local_da_imagem_da_particao"/sda.sf  2>> "$log"
 
 
 # https://www.hardware.com.br/tutoriais/usando-partimage/
-
+# https://sempreupdate.com.br/criar-um-cd-dvd-de-instalacao-a-partir-do-hd-para-qualquer-linux/
+# https://www.hardware.com.br/dicas/systemrescuecd.html
 
 
 
