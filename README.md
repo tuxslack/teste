@@ -27,6 +27,7 @@ Instalação: <br>
 > * partclone >= 0.2.77
 > * dd
 > * sfdisk
+> * gdisk (Pacote gptfdisk no Void Linux)
 > * gunzip
 > * cat
 > * dmidecode
