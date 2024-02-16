@@ -20,6 +20,7 @@
 
 
 # Clonar partições do HD no Linux
+# Realiza a clonagem de HD/SSD
 
 
 # Program to start saving or restoring image.
@@ -63,6 +64,7 @@
 # https://www.hardware.com.br/artigos/clonagem-backup-partimage/
 # https://www.certificacaolinux.com.br/backup-do-mbr-com-o-comando-dd/
 # https://www.shellscriptx.com/2016/12/estrutura-condicional-if-then-elif-else-fi.html
+# https://www.vivaolinux.com.br/artigo/Criar-CD-de-instalacao-a-partir-do-HD/
 
 
 
@@ -272,10 +274,20 @@ which smartctl
 
 which inxi
 
+
+# Verifique se o pacote "gdisk" está instalado no seu sistema. 
+
 # O comando gdisk no Linux é similar ao fdisk e permite manipular e criar partições. Ele foi especialmente criado para lidar com partições GPT.
 # Este novo esquema de tabela de alocação de partições foi criado para funcionar com os novos firmwares das placas-mãe EFI e UEFI.
 
 which gdisk
+
+# No Void Linux:
+#
+# $ xbps-query -Rs  gptfdisk
+# [-] gptfdisk-1.0.9_3 GPT fdisk text-mode partitioning tool
+
+# xbps-install -Suvy gptfdisk
 
 
  
@@ -560,6 +572,8 @@ lsblk -o KNAME,NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL > "$local_da_imagem_da_par
 
 
 
+# Verificar se o hardware é idêntico na hora de volta a imagem para o HD/SSD.
+
 dmidecode > "$local_da_imagem_da_particao"/Info-dmi.txt
 lshw      > "$local_da_imagem_da_particao"/Info-lshw.txt
 
@@ -611,6 +625,7 @@ dmesg | grep -i "error\|warn\|fail" >> "$local_da_imagem_da_particao"/dmesg.txt
 
 fdisk -l > "$local_da_imagem_da_particao"/fdisk.txt
 
+lsblk > "$local_da_imagem_da_particao"/lsblk.txt
 
 
 
@@ -792,11 +807,51 @@ sfdisk -d "$HD" > "$local_da_imagem_da_particao"/$nome_da_tabela_de_particao.sf 
    then
    
    echo "
-   gpt
+   Backup das partições GPT 
+   
+   
+   No Void Linux instala o pacote gptfdisk para usar o comando gdisk. 
+
+
+   
+Identifique o dispositivo que contém as partições GPT que você deseja fazer o backup. Você pode usar 
+o comando 'lsblk' para listar os dispositivos e suas respectivas partições.
+
+
+Anote o dispositivo que contém as partições GPT.
+
    " 
    
+lsblk
    
-# sgdisk
+sleep 10
+
+   
+# Execute o seguinte comando para criar o backup das partições GPT e da tabela de partição:
+
+sgdisk --backup="$local_da_imagem_da_particao"/gpt.backup  "$HD"  2>> "$log"
+
+
+# O que temos aqui? 
+#
+# O sinalizador --backup especifica que queremos fazer backup da tabela de partição.
+# Você precisará fornecer um caminho para o backup.
+#
+# O campo "$HD" especifica o dispositivo real do qual você deseja fazer backup. Tenha muito cuidado ao 
+# fazer isso. Verifique três vezes seus comandos. Requer Root ou sudo.
+
+
+
+# Substitua "$local_da_imagem_da_particao/gpt.backup" pelo caminho e nome de arquivo desejado para o backup e "$HD" pelo dispositivo identificado no passo 2.
+
+# Verifique se o backup foi criado corretamente. Você pode usar o comando "ls" para verificar.
+
+
+
+   
+
+
+
 
 # https://askubuntu.com/questions/386752/fixing-corrupt-backup-gpt-table
 # https://www.cyberciti.biz/faq/linux-backup-restore-a-partition-table-with-sfdisk-command/
@@ -804,6 +859,7 @@ sfdisk -d "$HD" > "$local_da_imagem_da_particao"/$nome_da_tabela_de_particao.sf 
 # https://sites.google.com/site/inforlae/erro-clonezilla-gpt-e-mbr
 # https://www.vivaolinux.com.br/dica/This-disk-contains-mismatched-GPT-and-MBR-partition-devsda-RESOLVIDO
 # http://www.zago.eti.br/hdclone.txt
+# https://www.dedoimedo.com/computers/gpt-disk-backup-partition-table.html
 
 
    
@@ -966,6 +1022,9 @@ if [ "$sistema_de_arquivo" == "btrfs" ];
    partclone.ntfs -z 10485760 -N -L /var/log/partclone.log -c -s "$ClonarParticao" --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - "$local_da_imagem_da_particao"/$(echo "$ClonarParticao" | cut -d/ -f3).ntfs-ptcl-img.gz. 2>> "$log"
    
 
+# Obs: O Partclone adiciona o .000 por padrão, se a imagem for maior ficará .001, 002. 
+
+
 
 # partclone.ntfs -z 10485760 -N -L /var/log/partclone.log -c -s /dev/sda1 --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - /home/partimag/Windows_Pro_8.1-29-10-2018-img/sda1.ntfs-ptcl-img.gz. 2> /tmp/split_error.ZHntnZ
 # partclone.ntfs -z 10485760 -N -L /var/log/partclone.log -c -s /dev/sda2 --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - /home/partimag/Windows_Pro_8.1-29-10-2018-img/sda2.ntfs-ptcl-img.gz. 2> /tmp/split_error.KZnreP
@@ -1056,6 +1115,9 @@ umount "$ClonarParticao"  1> /dev/null  2>> "$log"
 # Clonar uma partição para uma imagem
    
    partclone."$sistema_de_arquivo" -z 10485760 -N  -L /var/log/partclone.log -c -s "$ClonarParticao" --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - "$local_da_imagem_da_particao"/$(echo "$ClonarParticao" | cut -d/ -f3)."$sistema_de_arquivo"-ptcl-img.gz. 2>> "$log"
+ 
+
+# Obs: O Partclone adiciona o .000 por padrão, se a imagem for maior ficará .001, 002.
    
    
 sleep 1
@@ -1206,7 +1268,7 @@ fi
           Restaurar uma imagem para o HD/SSD
           "
           
-
+# Para fazer a restauração da imagem da tabela de partição e MBR ou GPT
 
 
 
@@ -1557,7 +1619,16 @@ if [ "$sistema_de_arquivo_do_windows" == "ntfs" ]; then
 
 # mount -t ntfs-3g -o dmask=0077,umask=0177 /dev/$dispositivo  $ponto_de_montagem
 
+
 mount -t ntfs-3g /dev/"$dispositivo"  "$ponto_de_montagem"    2>> "$log"
+
+
+# Forçar montagem de partição NTFS Windows
+
+# mount -t ntfs-3g -o remove_hiberfile /dev/"$dispositivo"   "$ponto_de_montagem"    2>> "$log"
+
+# https://www.vivaolinux.com.br/dicas/impressora.php?codigo=21645
+
 
 
 else
@@ -2004,8 +2075,34 @@ clear
 # ----------------------------------------------------------------------------------------
 
 
+# Identificar se esta usando MBR ou GPT no HD/SSD
 
-echo "Recuperando a tabela de partições..."
+
+# Há dois principais tipos de tabelas de partição disponíveis: 
+
+# Master Boot Record (MBR)
+# Tabela de Partição GUID (GPT) 
+
+
+# Valores: "msdos" para MBR e "gpt" para gpt
+
+# formato_da_tabela_de_particoes=$(parted -s $HD -- print | grep -E '^Partition Table: (gpt|msdos)$' | head -n 1 | sed 's,^Partition Table: \([a-z]\+\)$,\1,' | grep -E '^[a-z]+$')
+# formato_da_tabela_de_particoes=$(parted -s $HD -- print | grep -E '^Tabela de partições: (gpt|msdos)$' | head -n 1 | sed 's,^Tabela de partições: \([a-z]\+\)$,\1,' | grep -E '^[a-z]+$')
+
+echo "
+Qual o tipo de tabelas de partição da imagem a ser restaurada? [msdos ou gpt]"
+read formato_da_tabela_de_particoes
+
+if [ "$formato_da_tabela_de_particoes" == "msdos" ];
+   then
+   echo "
+   msdos
+   "
+
+
+echo "
+Recuperando a tabela de partições para $HD...
+"
 
 sfdisk –force "$HD" < "$local_da_imagem_da_particao"/sda.sf  2>> "$log"
 
@@ -2022,7 +2119,9 @@ sfdisk –force "$HD" < "$local_da_imagem_da_particao"/sda.sf  2>> "$log"
 
 
 
-echo "Restaurar o MBR..."
+echo "
+Restaurar o MBR no $HD...
+"
 
 # Na hora de restaurar os backups, basta acessar a pasta onde estão os arquivos e inverter os comandos, para que eles sejam restaurados:
 
@@ -2039,7 +2138,9 @@ dd if="$local_da_imagem_da_particao"/sda-mbr of="$HD" bs=512 count=1  2>> "$log"
 # Criar um menu com laço while com base nos arquivos .gz na pasta
 
 
-echo "Restaurar imagem usando o partclone (split, gzip) com fonte stdin"
+echo "
+Restaurar imagem usando o Partclone (split, gzip) com fonte stdin
+"
 
 
 # cat "$local_da_imagem_da_particao"/sda1.ntfs-ptcl-img.gz.a* | gunzip -c | partclone.ntfs -N -d -r -s - -o "$HD"1
@@ -2051,8 +2152,85 @@ echo "Restaurar imagem usando o partclone (split, gzip) com fonte stdin"
 
 # ----------------------------------------------------------------------------------------
 
+
+sleep 1
+clear
+
+   elif [ $formato_da_tabela_de_particoes == "gpt" ];
+   then
+   
+   
+
+echo "
+Restaurar o backup da tabela de partição (GPT) para discos $HD...
+
+gdisk, uma ferramenta projetada para criar e manipular tabelas de partição do tipo GPT.
+
+"
+
+sleep 5
+
+# sgdisk - uma versão do gdisk projetada para uso não interativo. 
+
+# Sgdisk em ação (restauração)
+
+# Se o sgdisk não estiver instalado, basta instalar o programa do repositório oficial.
+
+sgdisk --load-backup="$local_da_imagem_da_particao"/gpt.backup  "$HD"  2>> "$log"
+
+
+#         -G, --randomize-guids
+#
+#               Aleatorize o GUID do disco e os GUIDs exclusivos de todas as partições (mas
+#               não seus GUIDs de código de tipo de partição). Esta função pode ser usada
+#               depois de clonar um disco para renderizar todos os GUIDs mais uma vez
+#               exclusivo.
+
+# sgdisk -G "$HD"  2>> "$log"
+
+
+# Carregar o arquivo do backup (-l ou --load-backup).
+# A variavel "$HD" será o dispositivo de destino.
+
+
+# Você deve respeitar o processo. É muito fácil cometer erros ou alterar a ordem da origem e do destino. As lágrimas normalmente surgem neste momento.
+#
+# Ter backups de tabelas de partição pode ser útil se você precisar alterar todo o disco ou talvez reparar uma tabela de partição danificada. 
+#
+# Tenha cuidado e use sgdisk para backups GPT.
+
+
+# https://www.dedoimedo.com/computers/gpt-disk-backup-partition-table.html
+# https://askubuntu.com/questions/57908/how-can-i-quickly-copy-a-gpt-partition-scheme-from-one-hard-drive-to-another
+# https://unix.stackexchange.com/questions/346315/how-to-backup-gpt-partitions-and-file-system-type-only-no-files-folders
+# https://wiki.archlinux.org/title/GPT_fdisk
+# https://www.golinuxcloud.com/backup-copy-restore-partition-table-sfdisk/
+
+# ----------------------------------------------------------------------------------------
+
+
+
+  else
+  
+  
+   clear
+   
+   echo -e "\e[00;31m
+   O dispositivo possui um formato $formato_da_tabela_de_particoes  não suportado pelo Partclone.
+   \e[00m"
+
+sleep 10
+
+exit 
+
+
+fi
+
+
 sleep 2
 clear
+
+
 
 
 
@@ -2115,10 +2293,11 @@ clear
                   
 echo "Essas informações estão corretas [s|S|n|N]?
 
-Localização:               $local_da_imagem_da_particao
-Nome do arquivo:           $imagem
-Sistema de arquivo:        $sistema_de_arquivo
-Partição a ser restaurada: $HD$numero_da_particao
+Localização:                     $local_da_imagem_da_particao
+Nome do arquivo:                 $imagem
+Formato da tabela de partições:  $formato_da_tabela_de_particoes
+Sistema de arquivo:              $sistema_de_arquivo
+Partição a ser restaurada:       $HD$numero_da_particao
 "
 read resposta
 
@@ -2217,8 +2396,12 @@ fi
 # https://solitudelab.wordpress.com/2017/12/21/shell-script-operadores-de-comparacao-e-entrada-de-dados/
 
 
+# Puxa a imagem para o HD
 
 cat "$local_da_imagem_da_particao"/$imagem.a* | gunzip -c | partclone."$sistema_de_arquivo"  -L /var/log/partclone.log  -N -d -r -s - -o "$HD"$numero_da_particao   2>> "$log"
+
+
+# Agora é só aguardar para uma imagem de 650MB, a restauração demora cerca de 5 minutos dependendo do seu hardware. 
 
 
 # https://www.vivaolinux.com.br/topico/Shell-Script/Executar-script-com-argumento-sim-ou-nao
@@ -2515,6 +2698,22 @@ clear
                 Use: $0 --ajuda|--help|-h     mostra essa tela.                    
                 "
 echo "
+
+Preparando o HD
+===============
+
+
+Primeiro é necessário criar uma nova partição para que você possa guardar a imagem da partição 
+que está instalado o sistema operacional.
+
+Utilize o seu particionador preferido, eu utilizo o Gparted ou cfdisk.
+
+Após a criação, formate a partição (ext4) que você criou para guardar a imagem do sistema.
+
+Na hora de restaurar a imagem para o HD/SSD o hardware tem que ser o mesmo onde foi gerada a 
+imagem não pode ser diferente.
+
+
 # Limpa o MBR, mas não toca na tabela de partição, (muito útil para apagar o GRUB sem perder dados nas partições):
 #
 # sudo dd if=/dev/zero dd of=/dev/sda bs=446 count=1
