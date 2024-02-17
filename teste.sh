@@ -1503,10 +1503,14 @@ fi
             
             
         --restaurar|-r)
+ 
+clear
         
           echo "
           Restaurar uma imagem para o HD/SSD
           "
+
+sleep 2
           
 # Para fazer a restauração da imagem da tabela de partição e MBR ou GPT
 
@@ -1640,8 +1644,14 @@ clear
 clear
 
 echo "
-Tem certeza de quer APAGAR DEFINITIVAMENTE todos os DADOS do $HD..."
+Tem certeza de quer APAGAR DEFINITIVAMENTE todos os DADOS do $HD [s|S|y|Y|n|N]..."
 read resp
+
+
+# Verificar se a variavel $HD é nula
+
+[ -z "$resp" ] && { echo "O valor não pode ser nulo..." ; exit ; }
+
 
 case "$resp" in
     s|S|"")
@@ -1753,17 +1763,32 @@ umount /dev/"$dispositivo" 2>> "$log"
 smartctl --info /dev/"$dispositivo" | grep 'SMART support is:'
 
 
+
+# Em maquina virtual (VirtualBox) o comando smartctl -H /dev/"$dispositivo" não funciona.
+
 saude_do_HD=$(smartctl -H /dev/"$dispositivo" | grep : | cut -d: -f2 | sed 's/ //g')
 
 if [[ "$saude_do_HD" == "PASSED" ]]; then
 
-echo "HD OK"
+echo "
+HD OK
+"
+
+sleep 2
+clear
 
 else
 
-echo "HD com problema" | tee "$log"
+clear
 
-exit 
+echo "
+HD /dev/"$dispositivo" com problema.
+" | tee "$log"
+
+sleep 10
+clear
+
+# exit 
  
 fi
 
@@ -1848,7 +1873,7 @@ ls -1 /media/
 
 read -p "
 Informe o ponto de montagem para o dispositivo identificado como /dev/$dispositivo para montar.
-Ex: /mnt/ " ponto_de_montagem
+Ex: /mnt " ponto_de_montagem
 
 
 
@@ -2103,7 +2128,7 @@ ls -1 /media/
 
 read -p "
 Informe o ponto de montagem para o compartilhamento //$ip/$compartilhamento
-Ex: /mnt/ " ponto_de_montagem
+Ex: /mnt " ponto_de_montagem
 
 
 # Verificar se a variavel $ponto_de_montagem é nula
@@ -2226,7 +2251,7 @@ ls -1 /media/
 
 read -p "
 Informe o ponto de montagem para o compartilhamento //$ip/$compartilhamento
-Ex: /mnt/ " ponto_de_montagem
+Ex: /mnt " ponto_de_montagem
 
 
 # Verificar se a variavel $ponto_de_montagem é nula
@@ -2310,6 +2335,24 @@ sleep 2
 # https://www.vivaolinux.com.br/script/Menu-em-Shell-Script
 
 clear
+
+
+# ----------------------------------------------------------------------------------------
+
+
+read -p "Informe o caminho completo da pasta onde esta a imagem: " local_da_imagem_da_particao
+
+
+# Verificar se a variavel $local_da_imagem_da_particao é nula
+
+[ -z "$local_da_imagem_da_particao" ] && { echo "O valor não pode ser nulo... Informe a pasta onde estão os arquivos de imagem do sistema." ; exit ; }
+
+
+echo "
+Local: $local_da_imagem_da_particao
+"
+
+ls -1 $local_da_imagem_da_particao
 
 
 # ----------------------------------------------------------------------------------------
@@ -2792,7 +2835,7 @@ done
 
 # Determina o comprimento e a altura da tela do xfce4-terminal:
 
-altura="50"
+altura="30"
 comprimento="150"
 
 
