@@ -143,166 +143,278 @@ verificar(){
 
 # ==========================================================================================
 
-     which yad 1> /dev/null 2> /dev/null
+# Falta resolver
 
-     if [ $? == "0" ] ; then
+# Instalação automática de programas
 
-                echo "Programa Yad localizado..." 
-                
-	else
-	
-                echo "Programa Yad não esta instalado." 
-                
-#---------------------------------------------------#
-# Etapa 0 - Tente detectar a versão do sistema....  #
-#---------------------------------------------------#
 
-echo
-/bin/echo -e "\e[1;33m#---------------------------------------------#\e[0m"
-/bin/echo -e "\e[1;33m!   Detectando a versão do sistema            # \e[0m"
-/bin/echo -e "\e[1;33m#---------------------------------------------#\e[0m"
-echo
+# systemrescue-11.00-amd64.iso não tem "lsb_release"
 
-version=$(lsb_release -d | awk -F":" '/Description/ {print $2}') 
+# which lsb_release
 
-if [[ "$version" = *"Slackware"* ]] || [[ "$version" = *"Void Linux"* ]];
-then
-	echo
-/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
-/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+# version=$(lsb_release -d | awk -F":" '/Description/ {print $2}')
 
-# Instale o Yad
-xbps-install -Suy yad
 
-else
-/bin/echo -e "\e[1;31m!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\e[0m"
-/bin/echo -e "\e[1;31mSeu sistema não está executando o Void Linux.\e[0m"
-/bin/echo -e "\e[1;31mO script foi testado apenas no Void Linux...\e[0m"
-/bin/echo -e "\e[1;31mO script está saindo...\e[0m"
-/bin/echo -e "\e[1;31m!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\e[0m"
-echo
-exit
-fi
+version=$(cat /etc/os-release | grep "PRETTY_NAME=" | cut -d= -f2 | sed 's/"//g')
+# Void Linux
+# Ubuntu 23.10
 
-                
-		exit
-		
-     fi
 
-############################################################################################ 
 
-     which partclone.restore 1> /dev/null 2> /dev/null
+# https://listman.redhat.com/archives/fedora-users-br/2007-September/msg00019.html
 
-     if [ $? == "0" ] ; then
-
-                echo "Programa Partclone localizado..." 
-                
-	else
-	
-                echo "Programa Partclone não esta instalado." 
-
-#---------------------------------------------------#
-# Etapa 0 - Tente detectar a versão do sistema....  #
-#---------------------------------------------------#
-
-echo
-/bin/echo -e "\e[1;33m#---------------------------------------------#\e[0m"
-/bin/echo -e "\e[1;33m!   Detectando a versão do sistema            # \e[0m"
-/bin/echo -e "\e[1;33m#---------------------------------------------#\e[0m"
-echo
-
-version=$(lsb_release -d | awk -F":" '/Description/ {print $2}') 
-
-if [[ "$version" = *"Slackware"* ]] || [[ "$version" = *"Void Linux"* ]];
-then
-	echo
-/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
-/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
-
-# Instale o Partclone
-xbps-install -Suy partclone
-
-else
-/bin/echo -e "\e[1;31m!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\e[0m"
-/bin/echo -e "\e[1;31mSeu sistema não está executando o Void Linux.\e[0m"
-/bin/echo -e "\e[1;31mO script foi testado apenas no Void Linux...\e[0m"
-/bin/echo -e "\e[1;31mO script está saindo...\e[0m"
-/bin/echo -e "\e[1;31m!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\e[0m"
-echo
-exit
-fi
-                
-		exit
-		
-     fi
-     
 
 # ==========================================================================================
 
+pacotes="/tmp/pacote.log"
+
+ 
+
 # Dependências:
-
-which split
-which gparted
-which cfdisk
-which dmidecode
-which lshw
-which lspci
-which lsblk
-which parted
-which dd
-which sfdisk
-which partclone.chkimg
-which gpart
-which testdisk
-which fdisk
-which mount
-which umount
-which date
-which ntfs-3g
-which setxkbmap
-which ntfsfix 
-which bc
-which sed
-which ip
-which cut
-which sort
-which mkdir
-which rsync
-
-
-which smartctl
-
-which inxi
-
-
-# Verifique se o pacote "gdisk" está instalado no seu sistema. 
-
-# O comando gdisk no Linux é similar ao fdisk e permite manipular e criar partições. Ele foi especialmente criado para lidar com partições GPT.
-# Este novo esquema de tabela de alocação de partições foi criado para funcionar com os novos firmwares das placas-mãe EFI e UEFI.
-
-which gdisk
-
-# No Void Linux:
-#
-# $ xbps-query -Rs  gptfdisk
-# [-] gptfdisk-1.0.9_3 GPT fdisk text-mode partitioning tool
-
-# xbps-install -Suvy gptfdisk
+ 
+echo "split
+gparted
+gpart
+cfdisk
+dmidecode
+lshw
+lspci
+lsblk
+parted
+dd
+sfdisk
+gpart
+testdisk
+fdisk
+mount
+umount
+date
+ntfs-3g
+setxkbmap
+ntfsfix
+bc
+sed
+ip
+cut
+sort
+mkdir
+rsync
+smartctl
+inxi
+partclone.chkimg
+gdisk" > "$pacotes"
 
 
  
 # TestDisk - Um utilitário que suporta recuperação de partições perdidas em ambos MBR e GPT.
-
-which testdisk
 
 # https://www.cgsecurity.org/index.html?testdisk.html
 
 
 # gpart - Um utilitário que descobre o conteúdo de uma tabela de partições MBR destruída. Sua utilização está explicada no manual do gpart.
 
-which gpart
-
 # https://github.com/baruch/gpart
+
+
+
+
+
+# ==========================================================================================
+
+# Inicio do loop while
+
+while read -r pacote
+do
+  
+
+
+     which "$pacote" 1> /dev/null 2> /dev/null
+
+     if [ $? == "0" ] ; then
+
+                echo "Programa $pacote localizado..." 
+                
+	else
+	
+echo "
+Programa $pacote não esta instalado." 
+                
+#---------------------------------------------------#
+# Etapa 0 - Tente detectar a versão do sistema....  #
+#---------------------------------------------------#
+
+echo
+/bin/echo -e "\e[1;33m#---------------------------------------------#\e[0m"
+/bin/echo -e "\e[1;33m!   Detectando a versão do sistema            # \e[0m"
+/bin/echo -e "\e[1;33m#---------------------------------------------#\e[0m"
+echo
+
+
+
+if [[ "$version" = *"Void Linux"* ]];
+then
+
+
+
+# Quando o nome do pacote no repositorio oficial da distribuição Linux é diferente do nome que é usando junto do comando which.
+
+
+if [ "$pacote" == "partclone.chkimg" ];
+   then
+   
+      # Trocar o nome do pacote pelo nome que esta no repositorio oficial da distribuição Linux
+      
+      $pacote="partclone"
+      
+      
+      echo "$pacote"
+      
+fi  
+
+
+
+
+if [ "$pacote" == "gdisk" ];
+   then
+   
+      # Trocar o nome do pacote pelo nome que esta no repositorio oficial da distribuição Linux
+      
+      
+# Verifique se o pacote "gdisk" está instalado no seu sistema. 
+
+# O comando gdisk no Linux é similar ao fdisk e permite manipular e criar partições. Ele foi especialmente criado para lidar com partições GPT.
+# Este novo esquema de tabela de alocação de partições foi criado para funcionar com os novos firmwares das placas-mãe EFI e UEFI.
+
+
+# No Void Linux:
+#
+# $ xbps-query -Rs  gptfdisk
+# [-] gptfdisk-1.0.9_3 GPT fdisk text-mode partitioning tool
+
+# xbps-install -Suvy gptfdisk  
+    
+      $pacote="gptfdisk"
+      
+
+      
+      echo "$pacote"
+      
+fi 
+
+
+
+
+   
+	echo
+/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
+/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+
+echo "
+Instalando o $pacote...
+"
+
+xbps-install -Suy "$pacote"
+
+
+   elif [[ "$version" = *"Slackware"* ]];
+   then
+   echo "Slackware"
+
+	echo
+/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
+/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+
+echo "
+Instalando o $pacote...
+"
+
+# "$pacote"   
+
+
+
+   elif [[ "$version" = *"Debian"* ]] || [[ "$version" = *"Ubuntu"* ]];
+   then
+   echo "$version"
+
+	echo
+/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
+/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+
+
+apt update
+
+echo "
+Instalando o $pacote...
+"
+
+apt install -y "$pacote"  
+
+
+   elif [[ "$version" = *"SystemRescue 11.00"* ]];
+   then
+
+echo "
+SystemRescue usando a base do Arch Linux.
+
+Usa o gerenciador de pacotes Pacman.
+"
+
+
+/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
+/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+
+echo "
+Instalando o $pacote...
+"
+
+pacman -Sy "$pacote" 
+  
+
+# Descobrindo o nome de um pacote
+#
+# Algumas vezes o nome do pacote não é tão óbvio. Por exemplo, o leitor de PDF chama-se okular, mas este não é o 
+# nome do pacote. Para descobrirmos o nome exato (antes de seguir com a instalação) utilizamos o seguinte comando.
+#
+# pacman -Ss okular
+#
+# O terminal retornará o seguinte nome kdegraphics-okular Agora você pode instalá-lo seguindo o comando: pacman -Sy "$pacote"
+
+ 
+# https://empresadigital.net.br/como-instalar-e-remover-programas-no-arch-linux/
+
+
+else
+
+/bin/echo -e "\e[1;31m!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\e[0m"
+/bin/echo -e "\e[1;31mSeu sistema não está executando o Void Linux.\e[0m"
+/bin/echo -e "\e[1;31mO script foi testado apenas no Void Linux...\e[0m"
+/bin/echo -e "\e[1;31mO script está saindo...\e[0m"
+/bin/echo -e "\e[1;31m!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\e[0m"
+
+echo
+
+exit
+
+fi
+
+                
+#		exit
+		
+     fi
+
+
+
+
+done < "$pacotes"
+
+# Fim do loop while
+
+# ==========================================================================================
+
+
+# Removendo o arquivo temporario
+
+rm -Rf "$pacotes"
 
 
 
@@ -593,9 +705,38 @@ parted -ls > "$local_da_imagem_da_particao"/sda-pt.parted
 
 
 
+# lscpu
+# inxi -C
+# hwinfo --cpu
+
+echo "
+Processador: `cat /proc/cpuinfo | grep -i "model name" | cut -d: -f2 | head -n 1`
+
+Memória RAM:
+
+`free -m`
+
+`dmidecode --type 17`
+
+
+Placa-mãe:
+
+`dmidecode --type 1`
+
+" > "$local_da_imagem_da_particao"/dados.txt
+
+
+# https://sempreupdate.com.br/maneiras-de-exibir-detalhes-do-processador-no-terminal-linux/
+# https://www.vivaolinux.com.br/dica/Como-verificar-o-TIPO-e-o-TAMANHO-da-memoria-RAM-no-Linux-com-bonus
+
+
+
 inxi -v7azy > "$local_da_imagem_da_particao"/inxi.txt
 
 # https://forum.manjaro.org/t/very-unstable-system/126455/25
+# https://sempreupdate.com.br/como-clonar-disco-usando-o-linux/
+
+
 
 echo "
 Para sistema/hardware que reiniciar aleatoriamente com bastante frequência.
@@ -1141,7 +1282,10 @@ umount "$ClonarParticao"  1> /dev/null  2>> "$log"
  
 
 # Obs: O Partclone adiciona o .000 por padrão, se a imagem for maior ficará .001, 002.
-   
+
+
+# https://www.vivaolinux.com.br/dicas/impressora.php?codigo=17   
+
    
 sleep 1
 clear
