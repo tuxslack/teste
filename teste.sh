@@ -202,7 +202,13 @@ rsync
 smartctl
 inxi
 partclone.chkimg
-gdisk" > "$pacotes"
+gdisk
+yad
+xfce4-terminal
+xterm" > "$pacotes"
+
+
+
 
 
  
@@ -2707,15 +2713,14 @@ done
 # ==========================================================================================
 
 
+# Verificar se o Yad, o xfce4-terminal e o xterm estão instalado no sistema.
 
+# which yad              1> /dev/null 2> /dev/null || exit
 
-# Verificar se o Yad, o xterm  e o xfce4-terminal estão instalado no sistema.
+# which xfce4-terminal   1> /dev/null 2> /dev/null || exit
 
-which yad 1> /dev/null || exit
+# which xterm            1> /dev/null 2> /dev/null || exit
 
-which xfce4-terminal 1> /dev/null || exit
-
-which xterm 1> /dev/null || exit
 
 
 # Termina o comprimento e a altura da tela do xfce4-terminal
