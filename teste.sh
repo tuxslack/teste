@@ -324,7 +324,7 @@ xbps-install -Suy "$pacote"
 
    elif [[ "$version" = *"Slackware"* ]];
    then
-   echo "Slackware"
+
 
 	echo
 /bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
@@ -337,10 +337,41 @@ Instalando o $pacote...
 # "$pacote"   
 
 
-
-   elif [[ "$version" = *"Debian"* ]] || [[ "$version" = *"Ubuntu"* ]];
+   elif [[ "$version" = *"Fedora"* ]];
    then
-   echo "$version"
+
+
+	echo
+/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
+/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+
+echo "
+Instalando o $pacote...
+"
+
+# "$pacote" 
+
+
+   elif [[ "$version" = *"Alpine Linux"* ]];
+   then
+
+
+	echo
+/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
+/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+
+echo "
+Instalando o $pacote...
+"
+
+# "$pacote" 
+
+
+
+
+   elif [[ "$version" = *"Debian"* ]] || [[ "$version" = *"Ubuntu"* ]] || [[ "$version" = *"elementary"* ]] || [[ "$version" = *"Kali"* ]];
+   then
+
 
 	echo
 /bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
@@ -356,37 +387,69 @@ Instalando o $pacote...
 apt install -y "$pacote"  
 
 
-   elif [[ "$version" = *"SystemRescue 11.00"* ]];
+   elif [[ "$version" = *"Manjaro Linux"* ]] || [[ "$version" = *"SystemRescue 11.00"* ]] || [[ "$version" = *"Arch Linux"* ]];
    then
 
 echo "
-SystemRescue usando a base do Arch Linux.
+SystemRescue 11.00 usa a base do Arch Linux.
 
-Usa o gerenciador de pacotes Pacman.
+Gerenciador de pacotes Pacman.
 "
 
 
 /bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
 /bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
 
-echo "
-Instalando o $pacote...
-"
 
-pacman -Sy "$pacote" 
-  
 
 # Descobrindo o nome de um pacote
 #
 # Algumas vezes o nome do pacote não é tão óbvio. Por exemplo, o leitor de PDF chama-se okular, mas este não é o 
 # nome do pacote. Para descobrirmos o nome exato (antes de seguir com a instalação) utilizamos o seguinte comando.
 #
-# pacman -Ss okular
-#
+pacman -Ss "$pacote"
+
+
 # O terminal retornará o seguinte nome kdegraphics-okular Agora você pode instalá-lo seguindo o comando: pacman -Sy "$pacote"
+
+if [ $? -eq 0 ];
+   then
+   
+echo "Pacote $pacote encontrado nos repositórios oficiais..."
+
+# Atenção: Ao instalar pacotes no Arch, evite atualizar a lista de pacotes sem atualizar o sistema 
+# (por exemplo, quando um pacote não é encontrado nos repositórios oficiais). Na prática, não execute 
+# o comando pacman -Sy nome_pacote, pois isso poderia levar para problemas de dependências. 
+
+echo "
+Instalando o $pacote...
+"
+
+# Instala o pacote sem precisar confirmar com "yes/no ,S/N"...
+
+pacman -S "$pacote" --noconfirm
+  
+
+else
+
+
+echo -e "\e[00;31mPacote $pacote não encontrado nos repositórios oficiais... \e[00m"
+
+       
+fi  
+
 
  
 # https://empresadigital.net.br/como-instalar-e-remover-programas-no-arch-linux/
+# https://wiki.archlinux.org/title/Pacman_(Portugu%C3%AAs)
+# https://forum.biglinux.com.br/d/3005-comandos-b%C3%A1sicos-do-pacman--pamac-no-site-big-linux
+# https://forum.biglinux.com.br/d/1160-dica-pacman-ou-pamac-no-terminal-do-biglinux
+# https://bbs.archlinux.org/viewtopic.php?id=281731
+# https://www.vivaolinux.com.br/topico/Xubuntu/para-que-serve-etcos-release-e-etclsb-release
+# https://www.cyberciti.biz/faq/how-to-check-os-version-in-linux-command-line/
+# https://plus.diolinux.com.br/t/instalando-programas-facilmente-no-manjaro/4558?u=elppans
+# https://github.com/pop-os/shell/issues/387
+
 
 
 else
@@ -414,6 +477,10 @@ fi
 done < "$pacotes"
 
 # Fim do loop while
+
+
+# https://gist.github.com/natefoo/814c5bf936922dad97ff
+
 
 # ==========================================================================================
 
