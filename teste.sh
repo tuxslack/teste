@@ -1369,11 +1369,21 @@ Saúde do HD/SSD
 
 teste=$(smartctl -H  $ClonarParticao | cut -d: -f2 | sed  "s/[[:space:]]\+//g" | sed -n '5p')
 
+
+# Opção para ser usada no VirtualBox:
+
+# teste="PASSED"
+
+
 # PASSED
 
 if [ "$teste" == "PASSED" ];
    then
-    echo "O dispositivo $ClonarParticao  esta bom."
+   
+    echo "O dispositivo $ClonarParticao esta bom."
+
+sleep 5
+
 
 # === START OF READ SMART DATA SECTION ===
 # SMART overall-health self-assessment test result: PASSED
@@ -1434,6 +1444,9 @@ echo "
 Fazendo backup do MBR...
 "
 
+sleep 5
+clear
+
 # Tanto o gerenciador de boot quanto a tabela de particionamento do HD são salvos no primeiro setor do HD, a famosa trilha MBR, que contém apenas 512 bytes. Destes, 
 # 446 bytes são reservados para o setor de boot, enquanto os outros 66 bytes guardam a tabela de partição.
 
@@ -1482,6 +1495,8 @@ Fazendo backup da tabela de partições...
 Sempre tenha backup dos dados num hd externo.
 "
 
+sleep 5
+clear
 
 nome_da_tabela_de_particao=$(echo "$HD" | cut -d/ -f3)
 
@@ -1529,6 +1544,7 @@ Anote o dispositivo que contém as partições GPT.
 lsblk
    
 sleep 10
+clear
 
    
 # Execute o seguinte comando para criar o backup das partições GPT e da tabela de partição:
@@ -1575,6 +1591,7 @@ sgdisk --backup="$local_da_imagem_da_particao"/gpt.backup  "$HD"  2>> "$log"
    \e[00m"
 
 sleep 10
+clear
 
 exit 
 
@@ -1933,7 +1950,7 @@ rsync -av /var/log/partclone.log "$local_da_imagem_da_particao"/   2>> "$log"
 
 # Copia o arquivo de log para a pasta "$local_da_imagem_da_particao"
 
-rsync -av "$log"  "$local_da_imagem_da_particao"/ 
+rsync -av "$log"  "$local_da_imagem_da_particao"
 
 
 # REFERÊNCIAS:
@@ -1996,6 +2013,7 @@ clear
           "
 
 sleep 2
+clear
           
 # Para fazer a restauração da imagem da tabela de partição e MBR ou GPT
 
@@ -2037,7 +2055,7 @@ sleep 2
 # https://forums.gentoo.org/viewtopic-t-543350-start-0.html
 
 
-clear
+
 
 # Chamar a função verificar
 
@@ -2084,13 +2102,20 @@ dispositivos_localizados=$(fdisk -l | grep /dev/sd | grep Disk  | awk '{print $2
    
 else
 
+clear
+
 echo "
 Sem suporte ao idioma: $LANG
 " | tee  "$log"
 
+sleep 5
+clear
+
 exit
 
 fi
+
+
 
 # ----------------------------------------------------------------------------------------
 
@@ -2260,6 +2285,7 @@ smartctl --info /dev/"$dispositivo" | grep 'SMART support is:'
 # Em maquina virtual (VirtualBox) o comando smartctl -H /dev/"$dispositivo" não funciona.
 
 saude_do_HD=$(smartctl -H /dev/"$dispositivo" | grep : | cut -d: -f2 | sed 's/ //g')
+
 
 if [[ "$saude_do_HD" == "PASSED" ]]; then
 
@@ -2985,6 +3011,9 @@ echo "
 Recuperando a tabela de partições para $HD...
 "
 
+sleep 5
+clear
+
 sfdisk –force "$HD" < "$local_da_imagem_da_particao"/sda.sf  2>> "$log"
 
 
@@ -3006,6 +3035,9 @@ sfdisk –force "$HD" < "$local_da_imagem_da_particao"/sda.sf  2>> "$log"
 echo "
 Restaurar o MBR no $HD...
 "
+
+sleep 5
+clear
 
 # Na hora de restaurar os backups, basta acessar a pasta onde estão os arquivos e inverter os comandos, para que eles sejam restaurados:
 
@@ -3053,6 +3085,7 @@ gdisk, uma ferramenta projetada para criar e manipular tabelas de partição do 
 "
 
 sleep 5
+clear
 
 # sgdisk - uma versão do gdisk projetada para uso não interativo. 
 
@@ -3191,6 +3224,12 @@ Nome do arquivo:                 $imagem
 Formato da tabela de partições:  $formato_da_tabela_de_particoes
 Sistema de arquivo:              $sistema_de_arquivo
 Partição a ser restaurada:       $HD$numero_da_particao
+
+
+Comando que vai ser executado na próxima etapa:
+
+cat $local_da_imagem_da_particao/$imagem* | gunzip -c | partclone.$sistema_de_arquivo -L /var/log/partclone.log  -d -r -s -N - -o $HD$numero_da_particao   2>> $log
+
 "
 read resposta
 
@@ -3283,7 +3322,7 @@ else
     " | tee  "$log"
     
     
-    exit
+    # exit
     
 fi
 
@@ -3296,7 +3335,7 @@ fi
 
 # Puxa a imagem para o HD
 
-cat "$local_da_imagem_da_particao"/$imagem.a* | gunzip -c | partclone."$sistema_de_arquivo" -N  -L /var/log/partclone.log  -d -r -s - -o "$HD"$numero_da_particao   2>> "$log"
+cat "$local_da_imagem_da_particao"/$imagem* | gunzip -c | partclone."$sistema_de_arquivo" -d -r -s -N  -L /var/log/partclone.log - -o "$HD"$numero_da_particao   2>> "$log"
 
 
 # Agora é só aguardar para uma imagem de 650MB, a restauração demora cerca de 5 minutos dependendo do seu hardware. 
