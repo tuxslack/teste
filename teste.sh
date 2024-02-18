@@ -3060,9 +3060,9 @@ clear
 
 
 
-array=("$local_da_imagem_da_particao"/*.gz)
+array=("$local_da_imagem_da_particao"/*.gz.*)
 
-itens=$(ls -1 "$local_da_imagem_da_particao"/*.gz | wc -l)
+itens=$(ls -1 "$local_da_imagem_da_particao"/*.gz.* | wc -l)
 
 
 # Laço while para exibir o menu e tratar a escolha do usuário
