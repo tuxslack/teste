@@ -67,6 +67,9 @@
 # https://www.certificacaolinux.com.br/backup-do-mbr-com-o-comando-dd/
 # https://www.shellscriptx.com/2016/12/estrutura-condicional-if-then-elif-else-fi.html
 # https://www.vivaolinux.com.br/artigo/Criar-CD-de-instalacao-a-partir-do-HD/
+# https://www.tecmundo.com.br/sistema-operacional/113499-8-sistemas-operacionais-alternativos-windows-voce-precisa-conhecer.htm
+# https://canaltech.com.br/hardware/como-clonar-um-hd-para-um-ssd-211318/
+# https://www.avg.com/pt/signal/how-to-clone-a-hard-drive
 
 
 
@@ -3686,13 +3689,13 @@ Reparar HD NTFS (ntfs-3g)
 # ntfsfix /dev/<device name>
 
 
-O comando funciona apenas na partição desmontada. a partir do windows 8, a configuração de inicialização rápida deve ser desativada, 
-caso contrário hd não é montado em modo de escrita o que bloqueia qualquer função de reparo. se tudo der certo aparecera 
-isso no console:
+O comando funciona apenas na partição desmontada. A partir do Windows 8, a configuração de inicialização rápida deve ser desativada, 
+caso contrário HD/SSD não é montado em modo de escrita o que bloqueia qualquer função de reparo. Se tudo der certo aparecera isso 
+no terminal:
 
 # ntfsfix /dev/sda6
 Mounting volume... OK
-Processing of $MFT and $MFTMirr completed successfully.
+Processing of $ MFT and $ MFTMirr completed successfully.
 Checking the alternate boot sector... OK
 NTFS volume version is 3.1.
 NTFS partition /dev/sda6 was processed successfully.
@@ -3708,21 +3711,75 @@ chkdsk d: /f
 
 
 
-Recomendações antes da clonagem de Windows com muito tempo de uso no hardware:
+Recomendações antes da clonagem do Windows com muito tempo de uso no hardware:
 
-- Verificar se o HD/SSD esta muito fragmentado caso desfragmentar usando o proprio programa nativo do Windows.
+- Verificar se o HD/SSD está muito fragmentado caso esteja desfragmentar usando o próprio programa nativo do Windows.
 - Verificar a saúde do HD
-- Verificar por virus
+- Verificar por vírus
 - Anotar a chave de ativação do Windows
 - Verificar o HD/SSD com chkdsk Ex: chkdsk c: /f
-- Remover os programas inuteis que estão instalados
-- Fazer uma limpeza/faxina no Windows usandos os programas nativos dele ou um arquivo .bat
+- Remover os programas inúteis que estão instalados (os pré-instalados com windows e outros)
+
+   Programas pré-instalados pelo fabricante
+
+   A maioria dos fabricantes de notebooks, como a HP, Dell, Lenovo e Samsung, instalam programas 
+   em seu computador. Embora alguns desses programas sejam úteis, a maioria é desnecessária.
+
+- Realizar uma limpeza/faxina no Windows usando o programa nativo dele (limpeza de Disco) ou um arquivo .bat para liberar espaço.
+
+  Para remover arquivos mais simples, a ferramenta Limpeza de Disco é uma das mais básicas e completas. Ela é capaz de eliminar 
+  caches de navegação, arquivos temporários do sistema, logs de erros, arquivos esquecidos na Lixeira ou na pasta Download, e 
+  também arquivos de atualizações do sistema, que o Windows 10 não mais utiliza após os updates.
+
+
+- Remove extensões desnecessárias dos navegadores web (Exemplo Ask)
+
 - Verificar se existe algum drive com conflito no sistema
 - Verificar se falta algum drive no sistema
 - Verificar se tem problema de falta de dlls
-- Verificar por atualizações (instalar o pacote de atualização [SP1, SP2, SP3...] sem o acesso a internet)
+- Verificar por atualizações (instalar o pacote de atualização [SP1, SP2, SP3...] sem o acesso à internet)
+- Desativar os serviços desnecessários.
+- Verificar se o Firewall do Windows está ativado.
+- Desativar a hibernação do Windows (powercfg.exe /hibernate off)
+- Remove programas inúteis da inicialização do Windows
+
+- Remove os programas não licenciados (piratas). Eles são um problema sério de segurança, uma vez que eles 
+possuem arquivos modificados que podem conter vírus e outros arquivos maliciosos.
+
+- Verificar se os programas básicos estão instalados no Windows:
+
+  *   LibreOffice / WPS OFFICE  (suíte de escritório gratuita alternativa ao Pacote Office)
+  *   7-Zip                     (descompactador de arquivos)
+  *   Bloqueador de anúncios nos navegadores webs (extensão AdBlock)
+  *   Firefox
+  *   Google Chrome
+  *   ImgBurn ou CDBurnerXP     (gravar algum tipo de conteúdo em CDs ou em DVDs)
+  *   VLC / K-Lite Codec Pack   (player de vídeo)
+  *   DropBox ou Google Drive   (Backup de dados na nuvem)
+  *   Java
+  *   GIMP                      (editor de imagem uma alternativa ao Photoshop)
+  *   qBittorrent               (torrent) 
+  *   Malwarebytes Anti-Malware (versão gratuita)
+  *   Audacity                  (editor de áudio)
+  *   Thunderbird               (Cliente de Email)
+  *   Antivírus                 (Panda)
+  *   Master PDF Editor         (Leitor de arquivos PDF)
+  *   Clementine                (player de música)
+  *   clipgrab
+  *   Anydesk                   (Acesso remoto)
+  *   Driver da impressora
+  
+  
+
 
 "
+
+# REFERÊNCIAS:
+
+# https://www.oficinadanet.com.br/windows10/26715-quais-aplicativos-pre-instalados-do-windows-10-voce-pode-desinstalar-e-quais-manter
+# https://olhardigital.com.br/2019/05/29/noticias/veja-os-aplicativos-que-voce-pode-desinstalar-do-windows-10-apos-a-nova-atualizacao/
+# https://tecnoblog.net/responde/como-liberar-espaco-no-windows-10-e-limpar-arquivos-inuteis/
+
                 
             ;;
             
