@@ -641,7 +641,7 @@ Gerenciador de pacotes Pacman.
 # Algumas vezes o nome do pacote não é tão óbvio. Por exemplo, o leitor de PDF chama-se okular, mas este não é o 
 # nome do pacote. Para descobrirmos o nome exato (antes de seguir com a instalação) utilizamos o seguinte comando.
 #
-pacman -Ss "$pacote"
+pacman -Ss "$pacote" 2>> "$log"
 
 
 # O terminal retornará o seguinte nome kdegraphics-okular Agora você pode instalá-lo seguindo o comando: pacman -Sy "$pacote"
@@ -661,7 +661,7 @@ Instalando o $pacote...
 
 # Instala o pacote sem precisar confirmar com "yes/no ,S/N"...
 
-pacman -S "$pacote" --noconfirm
+pacman -Sy "$pacote" --noconfirm
   
 
 else
