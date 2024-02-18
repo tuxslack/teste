@@ -2905,6 +2905,7 @@ Local: $local_da_imagem_da_particao
 
 ls -1 $local_da_imagem_da_particao
 
+sleep 5
 
 # ----------------------------------------------------------------------------------------
 
