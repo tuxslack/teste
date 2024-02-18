@@ -47,6 +47,8 @@
 ##################################################################
 
 
+# REFERÊNCIAS:
+
 # https://www.vivaolinux.com.br/topico/yad/Criar-menu-com-radiolist
 # https://cleitonbueno.com/linux-estudando-e-explorando-o-21/
 # https://ubunlog.com/pt/partclone-software-gratuito-la-clonacion-particiones-e-imagenes/
@@ -65,6 +67,7 @@
 # https://www.certificacaolinux.com.br/backup-do-mbr-com-o-comando-dd/
 # https://www.shellscriptx.com/2016/12/estrutura-condicional-if-then-elif-else-fi.html
 # https://www.vivaolinux.com.br/artigo/Criar-CD-de-instalacao-a-partir-do-HD/
+
 
 
 
@@ -160,6 +163,7 @@ version=$(cat /etc/os-release | grep "PRETTY_NAME=" | cut -d= -f2 | sed 's/"//g'
 # Ubuntu 23.10
 
 
+# REFERÊNCIAS:
 
 # https://listman.redhat.com/archives/fedora-users-br/2007-September/msg00019.html
 
@@ -210,7 +214,7 @@ xterm" > "$pacotes"
 
 
 
-
+# REFERÊNCIAS:
  
 # TestDisk - Um utilitário que suporta recuperação de partições perdidas em ambos MBR e GPT.
 
@@ -244,7 +248,11 @@ do
 	
 echo "
 Programa $pacote não esta instalado." 
-                
+
+ 
+# Detecção de distribuição Linux
+ 
+              
 #---------------------------------------------------#
 # Etapa 0 - Tente detectar a versão do sistema....  #
 #---------------------------------------------------#
@@ -330,26 +338,216 @@ xbps-install -Suy "$pacote"
 /bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
 /bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
 
+
+# Para selecionar um mirror
+
+# nano /etc/slackpkg/mirrors
+
+
+# Antes que o slackpkg possa ser usado, ele precisa ter uma lista atual de pacotes e suas versões e que pode ser baixada automaticamente 
+# pela própria ferramenta assim que um mirror for selecionado. Para selecionar um mirror, apenas descomente um único URL no arquivo 
+# /etc/slackpkg/mirrors. Observe que os links são classificados por versões de lançamento do Slackware, portanto, certifique-se de que o 
+# link selecionado esteja na mesma versão em que você está interessado. É recomendado, embora não obrigatório, que você use o mirror 
+# mirrors.slackware.com, já que aquele irá redirecioná-lo automaticamente para o espelho mais próximo geograficamente.
+
+# Então, execute: 
+
+# slackpkg update gpg
+
+
+# Para atualizar a lista de pacotes
+
+# slackpkg update
+
+
+# Para pesquisar por pacotes nos repositórios.
+
+slackpkg search "$pacote"
+
+# slackpkg file-search "$pacote"
+
+
+if [ $? -eq 0 ];
+   then
+   
+echo "Pacote $pacote encontrado nos repositórios oficiais..."
+
+
 echo "
 Instalando o $pacote...
 "
 
-# "$pacote"   
+# Instala o pacote você precisar confirmar com "yes/no ,S/N"...
+
+slackpkg install "$pacote"   
+  
+
+else
 
 
-   elif [[ "$version" = *"Fedora"* ]];
+echo -e "\e[00;31mPacote $pacote não encontrado nos repositórios oficiais... \e[00m"
+
+# SlackBuilds: https://slackbuilds.org/
+
+
+# Instalar Pacotes com Sbopkg
+
+which sbopkg || exit
+
+# Sua primeira tarefa é sincronizar com o repositório do SlackBuilds.org - Ou seja, você 
+# permite que o sbopkg crie uma cópia local de todas as entradas do SlackBuild do 
+# servidor remoto, para a versão do Slackware que você está executando. Você pode usar 
+# o primeiro item de menu na tela principal baseada em curses, ou então você pode fazer 
+# isso a partir da linha de comando:
+
+sbopkg -r
+
+sqg -p "$pacote"
+
+sbopkg -i "$pacote"
+
+
+# REFERÊNCIAS:
+
+# https://docs.slackware.com/pt-br:howtos:slackware_admin:building_packages_with_sbopkg
+
+
+
+# REFERÊNCIAS:
+
+# http://www.dicas-l.com.br/arquivo/instalando_pacotes_binarios_no_slackware.php
+# https://docs.slackware.com/pt-br:slackware:slackpkg
+
+
+       
+fi  
+
+
+
+
+   elif [[ "$version" = *"Fedora"* ]] || [[ "$version" = *"Mageia"* ]] || [[ "$version" = *"Scientific Linux"* ]] || [[ "$version" = *"CentOS"* ]] || [[ "$version" = *"Rocky Linux"* ]] || [[ "$version" = *"Oracle Linux"* ]];
    then
-
 
 	echo
 /bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
 /bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
 
+
+# Verificar qual o gerenciador de pacote esta usando (yum ou dnf)
+
+which yum
+
+if [ $? -eq 0 ];
+   then
+ 
+# -------------------------------------------------------------------------------------------------
+   
+echo "
+Gerenciador de pacote: yum
+"
+
+# Para pesquisar por pacotes nos repositórios.
+
+# Podemos encontrar um pacote usando não apenas o nome exato, mas digitando uma palavra-chave, 
+# de modo que a ferramenta faça as correspondências com os arquivos do sistema. 
+
+# yum search "$pacote"
+
+
 echo "
 Instalando o $pacote...
 "
 
-# "$pacote" 
+yum install "$pacote"
+
+
+# REFERÊNCIAS:
+
+# https://e-tinet.com/yum/
+# https://plus.diolinux.com.br/t/centos-ubuntu-server-ou-debian-para-rodar-um-postgresql-e-um-apache-tomcat/60217
+# https://diolinux.com.br/editorial/mudancas-no-centos.html
+# https://wiki.mageia.org/en/Mageia_9_Notas_de_Lan%C3%A7amento_pt-BR#DNF:_o_gerenciador_de_pacotes_alternativo
+# https://fastoslinux.wordpress.com/2019/07/02/mageia-o-primo-do-fedora/
+# https://wiki.mageia.org/en/Mageia_9_Notas_de_Lan%C3%A7amento_pt-BR
+
+
+# -------------------------------------------------------------------------------------------------
+
+
+else
+
+# -------------------------------------------------------------------------------------------------
+
+echo "
+Gerenciador de pacote: dnf
+"
+
+# O DNF foi bifurcado do YUM.
+
+
+# Substituto do CentOS?
+
+# Antigo CentOS (Red Hat) => CentOS Stream, Rocky Linux, AlmaLinux OS (fork do CentOS), Oracle Linux
+
+
+
+# Rocky Linux (Criado pelo cofundador original do CentOS, Gregory Kurtzer)
+#
+#
+# Tudo começou com um comentário de blog.
+#
+# Em 8 de dezembro de 2020, a Red Hat anunciou que iria descontinuar o desenvolvimento do CentOS, 
+# que é uma versão downstream pronta para produção do Red Hat Enterprise Linux, em favor de uma nova 
+# variante de desenvolvimento upstream desse sistema operacional conhecido como "CentOS Stream". Em 
+# resposta, o fundador original do CentOS, Gregory Kurtzer, anunciou através um comentário no site do 
+# CentOS que iniciaria novamente um projeto para atingir os objetivos originais do CentOS. Seu nome foi 
+# escolhido como uma homenagem ao co-fundador do CentOS, Rocky McGaugh. Em 12 de dezembro, o repositório 
+# de código do Rocky Linux havia se tornado o repositório de tendência no GitHub.
+
+
+
+# REFERÊNCIAS:
+
+# Site do projeto: https://rockylinux.org/download/
+# https://github.com/rocky-linux
+# https://forums.rockylinux.org/
+# https://www.reddit.com/r/RockyLinux/
+# https://pt.linux-console.net/?p=20623
+# https://www.edivaldobrito.com.br/rocky-linux-um-substituto-do-centos-pronto-para-empresas/
+# https://pt.linux-console.net/?p=20623
+# https://sempreupdate.com.br/rocky-linux-9-tudo-o-que-voce-precisa-saber/
+# https://sempreupdate.com.br/as-principais-distribuicoes-linux-alternativas-ao-centos-para-2023/
+
+
+
+# Para pesquisar por pacotes nos repositórios.
+
+# dnf search "$pacote"
+
+
+echo "
+Instalando o $pacote...
+"
+
+dnf install "$pacote" 
+
+
+# No Fedora os repositórios são sincronizados toda vez que o DNF é utilizado. Sempre ao executar 
+# comandos para pesquisar, instalar ou remover pacotes, é como se o sistema executasse um "apt update"
+# de forma automática, desta forma você sempre estará com os repositórios atualizados ao efetuar 
+# qualquer transação.  
+#
+# Tal característica pode tornar o processo alguns segundos mais lento, dependendo da velocidade da 
+# sua conexão, mas também o torna, de certa forma mais simples e eficaz. Assim, para atualizar o 
+# sistema no Fedora precisamos utilizar apenas um comando, que é o seguinte:  
+#
+# dnf update
+
+# -------------------------------------------------------------------------------------------------
+
+      
+fi
+
 
 
    elif [[ "$version" = *"Alpine Linux"* ]];
@@ -360,18 +558,42 @@ Instalando o $pacote...
 /bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
 /bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
 
+
+# Habilitar Repositório (Remover #)
+
+# nano /etc/apk/repositories
+
+echo "
+Atualizar apk...
+"
+
+apk update
+
+
+# Para pesquisar por pacotes nos repositórios.
+
+# apk search "$pacote"
+
+
 echo "
 Instalando o $pacote...
 "
 
-# "$pacote" 
+apk add "$pacote" 
 
 
+# REFERÊNCIAS:
+
+# https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper
+# https://homelaber.com.br/alpine-linux-uma-nova-distro-linux-ligth-que-vale-a-pena-conhecer/
+# https://wiki.projetoroot.com.br/index.php/Alpine_Linux
+# https://medium.com/@aquilaluizinho/como-instalar-o-docker-no-alpine-linux-8c7f51ac26c1
 
 
-   elif [[ "$version" = *"Debian"* ]] || [[ "$version" = *"Ubuntu"* ]] || [[ "$version" = *"elementary"* ]] || [[ "$version" = *"Kali"* ]];
+   elif [[ "$version" = *"Debian"* ]] || [[ "$version" = *"Ubuntu"* ]] || [[ "$version" = *"Devuan"* ]] || [[ "$version" = *"Deepin"* ]] || [[ "$version" = *"PureOS"* ]]  || [[ "$version" = *"Parrot OS"* ]] || [[ "$version" = *"elementary"* ]] || [[ "$version" = *"Zorin OS"* ]] || [[ "$version" = *"Pop!_OS"* ]] || [[ "$version" = *"Linux Mint"* ]] || [[ "$version" = *"Kali"* ]];
    then
 
+# O "MX Linux" usa o "PRETTY_NAME" Debian no arquivo /etc/os-release.
 
 	echo
 /bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
@@ -380,14 +602,26 @@ Instalando o $pacote...
 
 apt update
 
+# Para pesquisar por pacotes nos repositórios.
+
+# apt-get search $pacote
+
+
 echo "
 Instalando o $pacote...
 "
 
-apt install -y "$pacote"  
+apt install -y "$pacote"
 
 
-   elif [[ "$version" = *"Manjaro Linux"* ]] || [[ "$version" = *"SystemRescue 11.00"* ]] || [[ "$version" = *"Arch Linux"* ]];
+# REFERÊNCIAS:
+
+# https://github.com/pop-os/pop/issues/2146
+# https://itsfoss.com/check-linux-mint-version/
+
+
+
+   elif [[ "$version" = *"Manjaro Linux"* ]] || [[ "$version" = *"SystemRescue 11.00"* ]] || [[ "$version" = *"Artix Linux"* ]]  || [[ "$version" = *"Arch Linux"* ]];
    then
 
 echo "
@@ -439,6 +673,7 @@ echo -e "\e[00;31mPacote $pacote não encontrado nos repositórios oficiais... \
 fi  
 
 
+# REFERÊNCIAS:
  
 # https://empresadigital.net.br/como-instalar-e-remover-programas-no-arch-linux/
 # https://wiki.archlinux.org/title/Pacman_(Portugu%C3%AAs)
@@ -450,6 +685,142 @@ fi
 # https://plus.diolinux.com.br/t/instalando-programas-facilmente-no-manjaro/4558?u=elppans
 # https://github.com/pop-os/shell/issues/387
 
+
+
+
+   elif [[ "$version" = *"openSUSE"* ]];
+   then
+
+
+	echo
+/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
+/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+
+
+# Gerenciando pacotes com Zypper
+
+# Você pode instalar pacotes com o YaST, mas também pode gerenciar pacotes na linha de comando com o Zypper. 
+#
+# O openSUSE até usa o formato RPM deste último.
+
+
+# Para atualizar seu sistema, use este comando:
+
+# zypper update
+
+
+echo "
+Instalando o $pacote com o Zypper...
+"
+
+zypper install "$pacote"
+
+
+
+# REFERÊNCIAS:
+
+# https://plus.diolinux.com.br/t/o-que-e-o-opensuse-tudo-o-que-voce-precisa-saber/41744
+# https://www.vivaolinux.com.br/topico/Suse/Base-do-OpenSuse
+# https://pt.opensuse.org/P%C3%A1gina_Principal
+# https://pt.opensuse.org/Portal:Zypper
+# https://diolinux.com.br/sistemas-operacionais/opensuse/opensuse-tumbleweed-e-leap.html
+# https://sempreupdate.com.br/a-historia-do-opensuse-linux/
+# https://pt.opensuse.org/Gerenciamento_de_pacotes
+
+
+
+
+   elif [[ "$version" = *"Gentoo"* ]];
+   then
+
+
+	echo
+/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
+/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+
+
+# Gerenciando pacotes (Portage)
+
+
+# Para atualizar seu sistema, use este comando:
+
+
+
+echo "
+Instalando o $pacote...
+"
+
+# O Portage é algo completamente diferente: ele puxa o código-fonte de um programa e o compila antes de instalar.
+
+emerge --ask "$pacote"
+
+
+# REFERÊNCIAS:
+
+# https://wiki.gentoo.org/wiki/Handbook:Parts/Installation/Base/pt-br
+# https://wiki.gentoo.org/wiki/Handbook:Parts/Installation/Tools/pt-br
+# https://www.edivaldobrito.com.br/instalar-programas-no-linux-via-terminal/
+
+
+
+   elif [[ "$version" = *"Exherbo Linux"* ]];
+   then
+
+
+	echo
+/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
+/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+
+
+# Gerenciando pacotes (Paludis)
+
+
+
+# Para atualizar seu sistema, use este comando:
+
+
+
+
+echo "
+Instalando o $pacote...
+"
+
+
+# REFERÊNCIAS:
+
+# https://www.vivaolinux.com.br/artigo/Exherbo-Linux-sacrificando-a-cabra
+# https://www.vivaolinux.com.br/dicas/impressora.php?codigo=15570
+
+
+
+   elif [[ "$version" = *"Solus"* ]];
+   then
+
+
+	echo
+/bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
+/bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
+
+
+# Gerenciando pacotes (Eopkg)
+
+
+
+# Para atualizar seu sistema, use este comando:
+
+
+
+echo "
+Instalando o $pacote...
+"
+
+eopkg install "$pacote"
+
+
+
+# REFERÊNCIAS:
+
+# https://www.edivaldobrito.com.br/instalar-programas-no-linux-via-terminal/
 
 
 else
@@ -479,7 +850,12 @@ done < "$pacotes"
 # Fim do loop while
 
 
+
+# REFERÊNCIAS:
+
+# https://www.vivaolinux.com.br/topico/Shell-Script/Como-funciona-o-comando-WHILE-internamente-quando-utilizamos-o-READ
 # https://gist.github.com/natefoo/814c5bf936922dad97ff
+
 
 
 # ==========================================================================================
@@ -647,10 +1023,17 @@ lsblk -o KNAME,TYPE,FSTYPE,SIZE,LABEL,UUID,MOUNTPOINT    2>> "$log"
 # /dev/sdb5 2G Linux
 # /dev/sdb6 356,4G HPFS/NTFS/exFAT
 
+
+# REFERÊNCIAS:
+
 # https://elias.praciano.com/2017/10/formate-automaticamente-a-saida-dos-seus-comandos-linux-em-tabelas/
 
 
 # rm -Rf /tmp/particao.log
+
+
+
+# REFERÊNCIAS:
 
 # https://br.ccm.net/faq/8483-sed-excluir-uma-ou-mais-linhas-de-um-arquivo
 # https://terminalroot.com.br/2015/07/30-exemplos-do-comando-sed-com-regex.html
@@ -676,7 +1059,11 @@ echo "
 "
 parted "$HD" unit MiB print   2>> "$log"
 
+
+# REFERÊNCIAS:
+
 # https://papy-tux.legtux.org/doc1274/index.html
+
 
 
 echo '
@@ -707,6 +1094,8 @@ umount "$ClonarParticao"  1> /dev/null  2>> "$log"
 
 [ $? -eq 0 ] && echo "Partição $ClonarParticao desmontada com sucesso..." ||   { echo -e "\e[00;31mFalha ao desmontar a partição $ClonarParticao \e[00m" ; }
 
+
+# REFERÊNCIAS:
 
 # https://mazer.dev/pt-br/linux/dicas/como-identificar-erro-no-script-shell-interromper/
 
@@ -750,6 +1139,9 @@ lsblk -o KNAME,NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL > "$local_da_imagem_da_par
 
 
 # lsblk --ascii -n -o name,mountpoint
+
+
+# REFERÊNCIAS:
 
 # https://acervolima.com/comando-lsblk-no-linux-com-exemplos/
 # https://elias.praciano.com/2022/05/obtenha-informacoes-dos-seus-sistemas-de-arquivos-com-o-lsblk/
@@ -799,12 +1191,17 @@ Placa-mãe:
 " > "$local_da_imagem_da_particao"/dados.txt
 
 
+# REFERÊNCIAS:
+
 # https://sempreupdate.com.br/maneiras-de-exibir-detalhes-do-processador-no-terminal-linux/
 # https://www.vivaolinux.com.br/dica/Como-verificar-o-TIPO-e-o-TAMANHO-da-memoria-RAM-no-Linux-com-bonus
 
 
 
 inxi -v7azy > "$local_da_imagem_da_particao"/inxi.txt
+
+
+# REFERÊNCIAS:
 
 # https://forum.manjaro.org/t/very-unstable-system/126455/25
 # https://sempreupdate.com.br/como-clonar-disco-usando-o-linux/
@@ -832,6 +1229,9 @@ Interpretando a leitura de logs de erros do dmesg:
 
 dmesg | grep -i "error\|warn\|fail" >> "$local_da_imagem_da_particao"/dmesg.txt
 
+
+# REFERÊNCIAS:
+
 # https://forums.linuxmint.com/viewtopic.php?t=227444
 
 
@@ -857,6 +1257,8 @@ fdisk -l "$HD" > "$local_da_imagem_da_particao"/fdisk.txt
 # Dispositivo Inicializar Início      Fim  Setores Tamanho Id Tipo
 # /dev/sdc1                 2048 15632383 15630336    7,5G  7 HPFS/NTFS/exFAT
 
+
+# REFERÊNCIAS:
 
 # https://www.dedoimedo.com/computers/partition-table-backup-restore.html
 
@@ -890,6 +1292,8 @@ O suporte SMART está: $(smartctl -i $ClonarParticao | grep "SMART support is:" 
 
 " | tee "$local_da_imagem_da_particao"/SMART.log
 
+
+# REFERÊNCIAS:
 
 # https://www.hostgator.com.br/blog/como-usar-o-comando-tee-do-linux/
 
@@ -990,6 +1394,8 @@ dd if=$HD of=$local_da_imagem_da_particao/sda-mbr  bs=512 count=1  2>> "$log"
 # dd if=/dev/sda of=/home/partimag/Windows_Pro_8.1-29-10-2018-img/sda-hidden-data-after-mbr skip=1 bs=512 count=2047
 
 
+# REFERÊNCIAS:
+
 # https://www.hardware.com.br/dicas/fazendo-backup-recuperando-mbr-tabela-particoes.html
 # https://antoniomedeiros.dev/blog/2012/04/21/problemas-envolvendo-bootloaders-mbr-e-tabela-de-particoes/
 # https://wiki.archlinux.org/title/Partitioning_(Portugu%C3%AAs)
@@ -1030,6 +1436,7 @@ sfdisk -d "$HD" > "$local_da_imagem_da_particao"/$nome_da_tabela_de_particao.sf 
 # você vai ficar com um particionamento inválido e dados faltando ou seja, uma receita para o desastre.
 
 
+# REFERÊNCIAS:
 
 # https://www.hardware.com.br/tutoriais/usando-partimage/
 # https://www.certificacaolinux.com.br/backup-do-mbr-com-o-comando-dd/
@@ -1085,10 +1492,8 @@ sgdisk --backup="$local_da_imagem_da_particao"/gpt.backup  "$HD"  2>> "$log"
 
 
 
-   
 
-
-
+# REFERÊNCIAS:
 
 # https://askubuntu.com/questions/386752/fixing-corrupt-backup-gpt-table
 # https://www.cyberciti.biz/faq/linux-backup-restore-a-partition-table-with-sfdisk-command/
@@ -1116,6 +1521,7 @@ exit
 
 fi
 
+# REFERÊNCIAS:
 
 # https://www.vivaolinux.com.br/topico/Iniciantes-no-Linux/gpt-ou-mbr-1
 # https://pt.linux-console.net/?p=18117
@@ -1183,6 +1589,9 @@ if [ "$sistema_de_arquivo" == "btrfs" ];
 # partclone.ext4 -c -s /dev/sda1 | gzip -c > ~/image_sda1.pcl.gz
 
 # Note: For maximum compression use gzip -c9
+
+
+# REFERÊNCIAS:
 
 # https://forum.manjaro.org/t/partclone-how-to-use-compression/53767
 
@@ -1324,6 +1733,9 @@ echo "
 "
 parted "$HD" unit MiB print
 
+
+# REFERÊNCIAS:
+
 # https://papy-tux.legtux.org/doc1274/index.html
 
   
@@ -1357,6 +1769,8 @@ umount "$ClonarParticao"  1> /dev/null  2>> "$log"
 # Obs: O Partclone adiciona o .000 por padrão, se a imagem for maior ficará .001, 002.
 
 
+# REFERÊNCIAS:
+
 # https://www.vivaolinux.com.br/dicas/impressora.php?codigo=17   
 
    
@@ -1379,6 +1793,9 @@ read reps
     
 fi
 
+
+# REFERÊNCIAS:
+
 # https://www.vivaolinux.com.br/topico/Shell-Script/Problemas-para-sair-do-loop-While
 
 
@@ -1400,6 +1817,8 @@ blkid -t TYPE="$sistema_de_arquivo" -s TYPE -s UUID -s PARTUUID >> "$log"
 # /dev/sda2: UUID="984C07B54C078D66" TYPE="ntfs" PARTUUID="b2ceef40-02"
 # /dev/sda1: UUID="584804274804068A" TYPE="ntfs" PARTUUID="b2ceef40-01"
 
+
+# REFERÊNCIAS:
 
 # https://forum.manjaro.org/t/manjaro-wont-boot-after-update-cant-switch-tty/145462/44
 
@@ -1445,13 +1864,19 @@ Copiando o arquivo de log gerado para a pasta $local_da_imagem_da_particao
          
 rsync -av /var/log/partclone.log "$local_da_imagem_da_particao"/   2>> "$log"
 
+
+# REFERÊNCIAS:
+
 # https://sobrelinux.info/questions/163716/whats-the-difference-between-cp-and-rsync
+
 
 
 # Copia o arquivo de log para a pasta "$local_da_imagem_da_particao"
 
 rsync -av "$log"  "$local_da_imagem_da_particao"/ 
 
+
+# REFERÊNCIAS:
  
 # https://www.hardware.com.br/comunidade/tr-substituir/869489/
 # https://terminalroot.com.br/2015/07/30-exemplos-do-comando-sed-com-regex.html
@@ -1524,6 +1949,9 @@ sleep 2
 
 # 60/20=3 imagens em 1 hora => 3*8 = 24 imagens  restaurada de HD por diaria de trabalho.
 
+
+# REFERÊNCIAS:
+
 # https://brasilescola.uol.com.br/matematica/como-transformar-minutos-em-horas.htm
 
 
@@ -1538,8 +1966,10 @@ sleep 2
 # Para descobrir qual versão do Windows seu dispositivo está executando, pressione a tecla 
 # do logotipo do Windows + R, digite winver no campo Abrir e selecione OK.
 
-# https://support.microsoft.com/pt-br/windows/qual-vers%C3%A3o-do-sistema-operacional-microsoft-windows-estou-usando-628bec99-476a-2c13-5296-9dd081cdd808
 
+# REFERÊNCIAS:
+
+# https://support.microsoft.com/pt-br/windows/qual-vers%C3%A3o-do-sistema-operacional-microsoft-windows-estou-usando-628bec99-476a-2c13-5296-9dd081cdd808
 
 
 # https://martins2010.wordpress.com/category/informatica/linux-informatica/
@@ -1610,6 +2040,9 @@ fi
 # Configurar o layout do teclado para BR
 
 # setxkbmap br
+
+
+# REFERÊNCIAS:
 
 # https://ubuntuforum-br.org/index.php?topic=119923.0
 
@@ -1792,6 +2225,9 @@ clear
  
 fi
 
+
+# REFERÊNCIAS:
+
 # https://wiki.archlinux.org/title/S.M.A.R.T.
 
 
@@ -1851,6 +2287,7 @@ done
 
 
 
+# REFERÊNCIAS:
 
 # https://www.reddit.com/r/zfs/comments/11nxm8n/working_bash_script_to_check_smarts_on_all_sata/
 # https://unix.stackexchange.com/questions/121767/run-smartctl-on-all-disks-of-a-server
@@ -1891,6 +2328,9 @@ mount -t ntfs-3g /dev/"$dispositivo"  "$ponto_de_montagem"    2>> "$log"
 # Forçar montagem de partição NTFS Windows
 
 # mount -t ntfs-3g -o remove_hiberfile /dev/"$dispositivo"   "$ponto_de_montagem"    2>> "$log"
+
+
+# REFERÊNCIAS:
 
 # https://www.vivaolinux.com.br/dicas/impressora.php?codigo=21645
 
@@ -1980,6 +2420,8 @@ fi
 # HD tem alguma criptografia nas partições.
 
 
+# REFERÊNCIAS:
+
 # https://www.vivaolinux.com.br/topico/Hard-on-Linux/Problemas-ao-tentar-montar-HD-externo
 
 
@@ -2023,6 +2465,9 @@ fi
 
 # Uma possível solução é desabilitar a inicialização rápida do Windows
 
+
+# REFERÊNCIAS:
+
 # https://antoniomedeiros.dev/blog/2015/09/16/como-desativar-a-inicializacao-rapida-do-windows/
 # https://github.com/vinyanalista
 
@@ -2037,6 +2482,7 @@ fi
 # powercfg -h off e pressione enter.
 
 
+# REFERÊNCIAS:
 
 # https://www.vivaolinux.com.br/topico/Ubuntu-e-Kubuntu/Erro-ao-montar-particao-NTFS
 # http://social.technet.microsoft.com/wiki/pt-br/contents/articles/13657.desativando-hibernacao-no-windows-8.aspx
@@ -2168,6 +2614,9 @@ sleep 30
 exit
  
 fi
+
+
+# REFERÊNCIAS:
 
 # https://rafaelit.com.br/como-montar-pastas-compartilhadas-linux-windows/
 
@@ -2306,6 +2755,9 @@ fi
 # [-] nfs-utils-2.6.4_1          Network File System utilities
 
 
+
+# REFERÊNCIAS:
+
 # https://www.vivaolinux.com.br/dica/Montando-e-conectando-em-um-servidor-NFS
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nfs-mount-on-ubuntu-20-04-pt
 
@@ -2318,8 +2770,10 @@ echo "================================================"
 echo "Saindo..."
 sleep 5s
 clear
-exit 0
+exit
 ;;
+
+
 *) echo "Opção inválida!"
 esac
 done
@@ -2327,20 +2781,31 @@ done
 # Fim do loop
 
 
+clear
 
-echo "Continuando...."
+echo "
+Continuando....
+"
 
 sleep 2
+clear
+
+
+# REFERÊNCIAS:
 
 # https://www.vivaolinux.com.br/script/Menu-em-Shell-Script
 
-clear
+
 
 
 # ----------------------------------------------------------------------------------------
 
+clear
 
-read -p "Informe o caminho completo da pasta onde esta a imagem: " local_da_imagem_da_particao
+ls -1 $local_da_imagem_da_particao
+
+read -p "
+Informe o caminho completo da pasta onde esta a imagem: " local_da_imagem_da_particao
 
 
 # Verificar se a variavel $local_da_imagem_da_particao é nula
@@ -2439,6 +2904,7 @@ O arquivo $local_da_imagem_da_particao/fdisk.txt não existe.
 fi
  
 
+# REFERÊNCIAS:
 
 # https://www.dedoimedo.com/computers/partition-table-backup-restore.html
 # https://www.vivaolinux.com.br/topico/Shell-Script/verificar-se-arquivo-existe
@@ -2468,6 +2934,8 @@ sfdisk –force "$HD" < "$local_da_imagem_da_particao"/sda.sf  2>> "$log"
 
 # Lembre-se que um jeito fácil de fazer e recuperar os backups é instalar temporáriamente um segundo HD na máquina.
 
+
+# REFERÊNCIAS:
 
 # https://www.hardware.com.br/tutoriais/usando-partimage/
 # https://sempreupdate.com.br/criar-um-cd-dvd-de-instalacao-a-partir-do-hd-para-qualquer-linux/
@@ -2555,6 +3023,8 @@ sgdisk --load-backup="$local_da_imagem_da_particao"/gpt.backup  "$HD"  2>> "$log
 #
 # Tenha cuidado e use sgdisk para backups GPT.
 
+
+# REFERÊNCIAS:
 
 # https://www.dedoimedo.com/computers/gpt-disk-backup-partition-table.html
 # https://askubuntu.com/questions/57908/how-can-i-quickly-copy-a-gpt-partition-scheme-from-one-hard-drive-to-another
@@ -2702,6 +3172,9 @@ tamanho_da_origem=$(echo $tamanho_da_origem*4 | bc)
 tamanho_do_destino=$(lsblk -o KNAME,TYPE,FSTYPE,SIZE,LABEL,UUID,MOUNTPOINT | grep "$HD" | head -n1 | awk '{print $3}' | cut -d, -f1)
 # 465,8G => 465
 
+
+# REFERÊNCIAS:
+
 # https://pt.linux-console.net/?p=10487
 
 
@@ -2748,6 +3221,8 @@ else
 fi
 
 
+# REFERÊNCIAS:
+
 # https://www.vivaolinux.com.br/dica/Retornar-o-tamanho-de-arquivo-ou-diretorio-em-bytes-(KB-MB)
 # https://solitudelab.wordpress.com/2017/12/21/shell-script-operadores-de-comparacao-e-entrada-de-dados/
 
@@ -2759,6 +3234,8 @@ cat "$local_da_imagem_da_particao"/$imagem.a* | gunzip -c | partclone."$sistema_
 
 # Agora é só aguardar para uma imagem de 650MB, a restauração demora cerca de 5 minutos dependendo do seu hardware. 
 
+
+# REFERÊNCIAS:
 
 # https://www.vivaolinux.com.br/topico/Shell-Script/Executar-script-com-argumento-sim-ou-nao
 # http://blog.evaldojunior.com.br/aulas/blog/shell%20script/2011/05/08/shell-script-parte-2-controle-de-fluxo.html
@@ -2923,6 +3400,7 @@ xfce4-terminal  --title="Clonar - Parclone" -e "bash -c \"$0 --clonar\"" --geome
 # xterm -e "$0 --clonar"
 
 
+# REFERÊNCIAS:
 
 # https://forum.xfce.org/viewtopic.php?id=12642
 # https://askubuntu.com/questions/980720/open-xfce-terminal-window-and-run-command-in-same-window
@@ -2998,10 +3476,17 @@ sed -i "8s/^/           #-------------------------------------------------------
 
 # sed -i "6s|site|$site|" /tmp/ajuda.log
 
+
+# REFERÊNCIAS:
+
 # http://www.zago.eti.br/script/sed.html
 
 
+
 # Usar "aspas duplas" para usar o sed com variavel.
+
+
+# REFERÊNCIAS:
 
 # https://pt.linux-console.net/?p=12008
 # https://www.vivaolinux.com.br/topico/Shell-Script/sed-com-variavel
@@ -3015,6 +3500,9 @@ rm -Rf /tmp/ajuda.log
 
 # xterm -e "$0 --ajuda ; sleep 10"
 
+
+
+# REFERÊNCIAS:
 
 # http://smokey01.com/yad/
 # http://ti1.free.fr/index.php/yad-creer-des-fenetres-pour-des-scripts-bash/
