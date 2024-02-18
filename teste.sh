@@ -175,7 +175,8 @@ pacotes="/tmp/pacote.log"
  
 
 # Dependências:
- 
+
+
 echo "split
 gparted
 gpart
@@ -212,6 +213,14 @@ xfce4-terminal
 xterm" > "$pacotes"
 
 
+# ou no laço while?
+
+
+#  Declarando um array chamado pacotes
+
+# declare -a pacotes=("pacote1" "pacote2" "pacote3" "pacoteN"...)
+
+
 
 
 # REFERÊNCIAS:
@@ -245,6 +254,8 @@ do
                 echo "Programa $pacote localizado..." 
                 
 	else
+
+clear
 	
 echo "
 Programa $pacote não esta instalado." 
@@ -323,11 +334,22 @@ fi
 /bin/echo -e "\e[1;32m.... Versão:$version\e[0m"
 /bin/echo -e "\e[1;32m.... Versão suportada detectada....em andamento\e[0m"
 
+
+    echo ""
+    echo -e "\e[01;44m \033[01;37m ╔═════════════════════════════════╗   \033[0m"
+    echo -e "\e[01;44m \033[01;37m ║ Instalando aplicativos via xbps ║   \033[0m"
+    echo -e "\e[01;44m \033[01;37m ╚═════════════════════════════════╝█  \033[0m"
+    echo -e "\e[01;44m \033[01;37m  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  \033[0m"
+    echo ""
+    
 echo "
 Instalando o $pacote...
 "
 
 xbps-install -Suy "$pacote"
+
+sleep 10
+clear
 
 
    elif [[ "$version" = *"Slackware"* ]];
@@ -382,6 +404,9 @@ Instalando o $pacote...
 slackpkg install "$pacote"   
   
 
+sleep 10
+clear
+
 else
 
 
@@ -390,9 +415,10 @@ echo -e "\e[00;31mPacote $pacote não encontrado nos repositórios oficiais... \
 # SlackBuilds: https://slackbuilds.org/
 
 
-# Instalar Pacotes com Sbopkg
+# Instalar pacotes com Sbopkg
 
-which sbopkg || exit
+which sbopkg  1> /dev/null 2> /dev/null || echo "Pacote Sbopkg não esta instalado." # exit
+
 
 # Sua primeira tarefa é sincronizar com o repositório do SlackBuilds.org - Ou seja, você 
 # permite que o sbopkg crie uma cópia local de todas as entradas do SlackBuild do 
@@ -404,7 +430,8 @@ sbopkg -r
 
 sqg -p "$pacote"
 
-sbopkg -i "$pacote"
+sbopkg -ki "$pacote"
+
 
 
 # REFERÊNCIAS:
@@ -412,14 +439,13 @@ sbopkg -i "$pacote"
 # https://docs.slackware.com/pt-br:howtos:slackware_admin:building_packages_with_sbopkg
 
 
-
-# REFERÊNCIAS:
-
 # http://www.dicas-l.com.br/arquivo/instalando_pacotes_binarios_no_slackware.php
 # https://docs.slackware.com/pt-br:slackware:slackpkg
 
 
-       
+sleep 10
+clear
+      
 fi  
 
 
@@ -460,6 +486,9 @@ Instalando o $pacote...
 
 yum install "$pacote"
 
+
+sleep 10
+clear
 
 # REFERÊNCIAS:
 
@@ -532,6 +561,9 @@ Instalando o $pacote...
 dnf install "$pacote" 
 
 
+sleep 10
+clear
+
 # No Fedora os repositórios são sincronizados toda vez que o DNF é utilizado. Sempre ao executar 
 # comandos para pesquisar, instalar ou remover pacotes, é como se o sistema executasse um "apt update"
 # de forma automática, desta forma você sempre estará com os repositórios atualizados ao efetuar 
@@ -582,6 +614,9 @@ Instalando o $pacote...
 apk add "$pacote" 
 
 
+sleep 10
+clear
+
 # REFERÊNCIAS:
 
 # https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper
@@ -613,6 +648,9 @@ Instalando o $pacote...
 
 apt install -y "$pacote"
 
+
+sleep 10
+clear
 
 # REFERÊNCIAS:
 
@@ -663,6 +701,9 @@ Instalando o $pacote...
 
 pacman -Sy "$pacote" --noconfirm
   
+
+sleep 10
+clear
 
 else
 
@@ -716,6 +757,8 @@ Instalando o $pacote com o Zypper...
 zypper install "$pacote"
 
 
+sleep 10
+clear
 
 # REFERÊNCIAS:
 
@@ -754,6 +797,9 @@ Instalando o $pacote...
 
 emerge --ask "$pacote"
 
+
+sleep 10
+clear
 
 # REFERÊNCIAS:
 
@@ -817,6 +863,8 @@ Instalando o $pacote...
 eopkg install "$pacote"
 
 
+sleep 10
+clear
 
 # REFERÊNCIAS:
 
@@ -849,6 +897,9 @@ done < "$pacotes"
 
 # Fim do loop while
 
+
+sleep 10
+clear
 
 
 # REFERÊNCIAS:
@@ -1111,15 +1162,21 @@ echo "
 Onde gostaria que salvar a imagem da partição $ClonarParticao? Ex: /media/backup/clonezilla/Windows_8.1_Pro-$(date +%d-%m-%Y)-img/"
 read local_da_imagem_da_particao
 
-# Verificar se a variavel $ClonarParticao é nula
+
+# Verificar se a variavel $local_da_imagem_da_particao é nula
 
 [ -z "$local_da_imagem_da_particao" ] && { echo "O valor não pode ser nulo... Informe um local para salvar a imagem da partição." ; exit ; }
 
 
-mkdir -p "$local_da_imagem_da_particao" 2>> "$log"
 
+# Verifica se a pasta "$local_da_imagem_da_particao" existe e caso ela não exista cria.
 
+if [ ! -d "${local_da_imagem_da_particao}" ]
+then
+     mkdir -p "${local_da_imagem_da_particao}"  2>> "$log"
+fi
 
+# https://plus.diolinux.com.br/t/script-de-pos-instalacao-sugestoes-e-correcoes/39003/10
 
 
 
@@ -3058,23 +3115,30 @@ clear
 
 
 
-
+# Pegar todos os arquivos *.gz.* da pasta $local_da_imagem_da_particao
 
 array=("$local_da_imagem_da_particao"/*.gz.*)
+
+
+# Ver a quantidade de arquivos .gz na pasta $local_da_imagem_da_particao
 
 itens=$(ls -1 "$local_da_imagem_da_particao"/*.gz.* | wc -l)
 
 
-# Laço while para exibir o menu e tratar a escolha do usuário
+# Inicio do laço while para exibir o menu e tratar a escolha do usuário
 
 while true; do
 
 
 
+# Inicio do laço for (gera o menu na tela)
+
 for((i = 0; i < $itens; i++))
 do
       echo "[$i] `basename ${array[$i]}`"
 done
+
+# Fim do laço for
 
 
 # Solicitar a opção do usuário
@@ -3229,7 +3293,7 @@ fi
 
 # Puxa a imagem para o HD
 
-cat "$local_da_imagem_da_particao"/$imagem.a* | gunzip -c | partclone."$sistema_de_arquivo"  -L /var/log/partclone.log  -N -d -r -s - -o "$HD"$numero_da_particao   2>> "$log"
+cat "$local_da_imagem_da_particao"/$imagem.a* | gunzip -c | partclone."$sistema_de_arquivo" -N  -L /var/log/partclone.log  -d -r -s - -o "$HD"$numero_da_particao   2>> "$log"
 
 
 # Agora é só aguardar para uma imagem de 650MB, a restauração demora cerca de 5 minutos dependendo do seu hardware. 
