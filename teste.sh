@@ -180,6 +180,8 @@ pacotes="/tmp/pacote.log"
 # Dependências:
 
 
+# No arquivo "systemrescue-11.00-amd64.iso" não tem os pacotes: yad e xterm
+
 echo "split
 gparted
 gpart
