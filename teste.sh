@@ -3199,6 +3199,9 @@ array=("$local_da_imagem_da_particao"/*.gz.*)
 
 itens=$(ls -1 "$local_da_imagem_da_particao"/*.gz.* | wc -l)
 
+echo "
+Arquivos de imagens localizados na pasta $local_da_imagem_da_particao
+"
 
 # Inicio do laço while para exibir o menu e tratar a escolha do usuário
 
@@ -3218,18 +3221,24 @@ done
 
 # Solicitar a opção do usuário
 
-echo "Digite o número da opção desejada (100 para sair): " 
+echo "
+Digite o número da opção desejada (100 para sair): " 
 read opcao
+
 clear
 
 # Verificar se o usuário digitou 0 para sair
+
 if [[ $opcao -eq 100 ]]; then
+
 clear
 break
+
 fi
 
 
 if (( $opcao < $itens )); then
+
 		 echo -e "Você escolheu a opcao `basename ${array[$opcao]}`, tente novamente:\n"
 		 
 		 # Percorrer o array
