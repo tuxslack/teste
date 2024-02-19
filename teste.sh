@@ -1393,9 +1393,12 @@ O suporte SMART está: $(smartctl -i $ClonarParticao | grep "SMART support is:" 
 
 # Opção para ser usada no VirtualBox:
 
-teste=$(smartctl -i  $ClonarParticao | grep -i "Device Model:" | cut -d":" -f2 | sed  "s/[[:space:]]\+//g")
+teste=$(smartctl -i  $ClonarParticao | grep -i "Device Model:" | cut -d":" -f2)
 
-if [ "$teste" == "VBOX HARDDISK" ];
+# | sed  "s/[[:space:]]\+//g"
+
+
+if [ "$teste" == *"VBOX HARDDISK"* ];
    then
 
 teste="PASSED" 
