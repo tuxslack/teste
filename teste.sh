@@ -213,8 +213,11 @@ smartctl
 inxi
 partclone.chkimg
 gdisk
-yad
 xfce4-terminal
+pv
+cifs-utils
+smbclient
+yad
 xterm" > "$pacotes"
 
 
@@ -926,13 +929,14 @@ rm -Rf "$pacotes"
 # ==========================================================================================
 
     echo -e "\e[00;31m 
-Precauções
+Precauções:
 
-    Como o risco de perda de dados não pode ser descartado, é importante antes de iniciar a operação
+    Como o risco de perda de dados não pode ser descartado, é importante antes de iniciar a operação.
 
-    fazer backup de dados de dispositivos afetados
+    Fazer backup de dados de dispositivos afetados.
 
-    identificar corretamente os volumes ou partições a serem modificadas
+    Identificar corretamente os volumes ou partições a serem modificadas.
+      
    \e[00m"
    
    
@@ -964,6 +968,17 @@ echo
 /bin/echo -e "\e[1;36m#----------------------------------------------------#\e[0m"
 echo
 
+echo "
+Certifique-se de realizar backup de seus dados antes de qualquer operação de clonagem e restauração de sistema.
+
+Por que usar esse script?
+
+Para o caso de ocorrer um problema;
+Um vírus raro pode atacar o Linux corrompendo alguns dados importantes; 
+Sua empresa ou você pode ser alvo de Ransomware;
+Pode falhar Disco rígido (HDD) / SSD muito em breve.  
+
+"
 
 # ==========================================================================================
 
@@ -2676,10 +2691,52 @@ Ex: /mnt " ponto_de_montagem
 
 umount "$ponto_de_montagem" 2>> "$log"
 
+sleep 2
+clear
 
-# Compartilhamento SAMBA com senha
+# ------------------------------------------------------------------------------------------------------------------------
 
-mount -t cifs "$ip"/"$compartilhamento" "$ponto_de_montagem" -o user="$nome_do_usuario", password="$senha"
+# Comparar se digitou s S ou n N
+
+echo "
+O compartilhamento $compartilhamento no servidor $ip é com senha? [s | S ou n | N]"
+
+read -n1 MCONFIRMA
+
+# -n1 força um enter depois de teclar um caractere, sem ele permite teclar mais de um caracter e precisa teclar enter.
+
+
+  if [ "$MCONFIRMA" = "S" -o "$MCONFIRMA" = "s" ]; then
+
+      # Requer confirmação, com a tecla s ou S prossegue.
+      
+      echo "Prosseguindo..."
+      
+      # Compartilhamento SAMBA com senha
+ 
+      mount -t cifs //"$ip"/"$compartilhamento" "$ponto_de_montagem" -o user="$nome_do_usuario", password="$senha" 
+      
+      
+      else
+      
+     # Qualquer outra tecla cai aqui e encerra o script. 
+
+      
+     # Compartilhamento SAMBA sem senha
+
+      mount -t cifs //"$ip"/"$compartilhamento" "$ponto_de_montagem" -o guest 
+
+      
+     #  echo "encerrando script, teclou $MCONFIRMA"
+     #  exit
+
+   
+  fi
+
+# ------------------------------------------------------------------------------------------------------------------------
+
+
+ 
 
 if [ $? -eq 0 ]; then
  
@@ -2708,10 +2765,12 @@ exit
 fi
 
 
+
 # REFERÊNCIAS:
 
 # https://rafaelit.com.br/como-montar-pastas-compartilhadas-linux-windows/
-
+# https://www.shellscriptx.com/2016/12/estrutura-condicional-if-then-elif-else-fi.html
+# https://www.zago.eti.br/script/if.html
 
 
 echo "================================================"
@@ -3871,7 +3930,9 @@ possuem arquivos modificados que podem conter vírus e outros arquivos malicioso
   
   
 
-
+Nunca clonei um sistema macOS usando Linux, mas é possível fazer isso com o dd. O partclone também pode 
+funcionar, mas é importante verificar a compatibilidade com o sistema de arquivos do macOS.
+ 
 "
 
 # REFERÊNCIAS:
@@ -3879,6 +3940,20 @@ possuem arquivos modificados que podem conter vírus e outros arquivos malicioso
 # https://www.oficinadanet.com.br/windows10/26715-quais-aplicativos-pre-instalados-do-windows-10-voce-pode-desinstalar-e-quais-manter
 # https://olhardigital.com.br/2019/05/29/noticias/veja-os-aplicativos-que-voce-pode-desinstalar-do-windows-10-apos-a-nova-atualizacao/
 # https://tecnoblog.net/responde/como-liberar-espaco-no-windows-10-e-limpar-arquivos-inuteis/
+# https://www.dz-techs.com/pt/methods-to-clone-your-linux-hard-drive/
+# https://eduardomozartdeoliveira.wordpress.com/2018/08/22/clonando-um-hdd-ssd-maior-para-um-hdd-sdd-menor/
+# https://caixaseca.blogspot.com/2011/09/personalizando-o-clonezilla-live.html
+
+
+
+# Porque clonar HD com o dd demora tanto?
+
+# https://www.hardware.com.br/comunidade/clonar-hd/1319474/
+
+
+# MacOS
+
+# https://medium.com/@crp_underground/acelerando-comando-dd-no-macos-15e982d03f38
 
                 
             ;;
