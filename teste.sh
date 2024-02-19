@@ -3360,6 +3360,8 @@ else
     O tamanho do dispositivo de armazenamento de destino não pode ser menor do que o tamanho do dispositivo de armazenamento de origem.
     " | tee  "$log"
     
+    sleep 10
+    clear
     
     # exit
     
@@ -3373,6 +3375,8 @@ fi
 
 
 # Puxa a imagem para o HD
+
+clear
 
 cat "$local_da_imagem_da_particao"/$imagem* | gunzip -c | partclone."$sistema_de_arquivo" -d -r -s -N  -L /var/log/partclone.log - -o "$HD"$numero_da_particao   2>> "$log"
 
@@ -3390,8 +3394,13 @@ cat "$local_da_imagem_da_particao"/$imagem* | gunzip -c | partclone."$sistema_de
                   
                   
 	 else
+	        
+	        clear
+	        
 		echo "Você escolhe $opcao. Adeus!"
+		
 		break
+		
 	fi
 
 
