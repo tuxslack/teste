@@ -2,6 +2,17 @@
 
 ## Informações: <br>  <br>
 
+Instale o Git se ele não estiver instalado no sistema.       <br>
+Clone este repositório ou baixe e descompacte o arquivo zip. <br> <br>
+
+
+```sh
+$ git clone https://github.com/tuxslack/teste/teste.git
+
+```
+<br>
+<br>
+
 Uso:  <br>
 
 ```sh
