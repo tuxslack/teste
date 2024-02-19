@@ -1368,13 +1368,13 @@ Local onde será salvo a imagem da partição $ClonarParticao => $local_da_image
 
 Dispositivo de origem
 
-Fabricante:           $(smartctl -i $ClonarParticao | grep "Model Family:"     | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
-Modelo:               $(smartctl -i $ClonarParticao | grep "Device Model:"     | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
-Número de série:      $(smartctl -i $ClonarParticao | grep "Serial Number:"    | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
-Versão do firmware:   $(smartctl -i $ClonarParticao | grep "Firmware Version:" | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
-Capacidade:           $(smartctl -i $ClonarParticao | grep "User Capacity:"    | cut -d: -f2 | sed  "s/[[:space:]]\+//g" | cut -d[ -f2 | sed 's/]//')
-Taxa de rotação:      $(smartctl -i $ClonarParticao | grep "Rotation Rate:"    | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
-O suporte SMART está: $(smartctl -i $ClonarParticao | grep "SMART support is:" | sed -n '2p' | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+Fabricante:           $(smartctl -i $ClonarParticao | grep -i "Model Family:"     | cut -d: -f2 | sed  "s/^[[:space:]]\+//g" | sed  "s/[[:space:]]$\+//g")
+Modelo:               $(smartctl -i $ClonarParticao | grep -i "Device Model:"     | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+Número de série:      $(smartctl -i $ClonarParticao | grep -i "Serial Number:"    | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+Versão do firmware:   $(smartctl -i $ClonarParticao | grep -i "Firmware Version:" | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+Capacidade:           $(smartctl -i $ClonarParticao | grep -i "User Capacity:"    | cut -d: -f2 | sed  "s/[[:space:]]\+//g" | cut -d[ -f2 | sed 's/]//')
+Taxa de rotação:      $(smartctl -i $ClonarParticao | grep -i "Rotation Rate:"    | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
+O suporte SMART está: $(smartctl -i $ClonarParticao | grep -i "SMART support is:" | sed -n '2p' | cut -d: -f2 | sed  "s/[[:space:]]\+//g")
 
 " | tee "$local_da_imagem_da_particao"/SMART.log
 
