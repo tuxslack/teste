@@ -1388,6 +1388,24 @@ O suporte SMART está: $(smartctl -i $ClonarParticao | grep "SMART support is:" 
 
 
 
+
+
+
+# Opção para ser usada no VirtualBox:
+
+teste=$(smartctl -i  $ClonarParticao | grep -i "Device Model:" | cut -d":" -f2 | sed  "s/[[:space:]]\+//g")
+
+if [ "$teste" == "VBOX HARDDISK" ];
+   then
+
+teste="PASSED" 
+
+
+else
+
+
+# É maquina fisica
+
 echo "
 Saúde do HD/SSD
 "
@@ -1395,10 +1413,9 @@ Saúde do HD/SSD
 
 teste=$(smartctl -H  $ClonarParticao | cut -d: -f2 | sed  "s/[[:space:]]\+//g" | sed -n '5p')
 
-
-# Opção para ser usada no VirtualBox:
-
-# teste="PASSED"
+ 
+fi
+   
 
 
 # PASSED
@@ -2004,6 +2021,8 @@ rsync -av "$log"  "$local_da_imagem_da_particao"
 
 
   else
+
+   # Se o HD ou SSD estiver com problema cai aqui.
   
    clear
    
@@ -2019,8 +2038,10 @@ rsync -av "$log"  "$local_da_imagem_da_particao"
 # Drive failure expected in less than 24 hours. SAVE ALL DATA.
 # No failed Attributes found.
 
+sleep 10
 
 exit 
+clear
 
 
 fi
