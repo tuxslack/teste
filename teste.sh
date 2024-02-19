@@ -963,26 +963,31 @@ Precauções:
 
 # ==========================================================================================
 
-echo
-/bin/echo -e "\e[1;36m#----------------------------------------------------#\e[0m"
-/bin/echo -e "\e[1;36m#   $descricao - $versao     #\e[0m"
-/bin/echo -e "\e[1;36m#   Escrito por $autor - $data     #\e[0m"
-/bin/echo -e "\e[1;36m#   $site  #\e[0m"
-/bin/echo -e "\e[1;36m#----------------------------------------------------#\e[0m"
-echo
 
-echo "
+
+echo -e "\n\e[1;34m
+#----------------------------------------------------#
+#   $descricao - $versao     #
+#   Escrito por $autor - $data     #
+#   $site  #
+#----------------------------------------------------#
+\e[0m"
+
+
+echo -e "\n\e[1;31m
 Certifique-se de realizar backup de seus dados antes de qualquer 
 operação de clonagem e restauração de sistema.
+\e[0m\n"
 
-Por que usar esse script?
+echo -e "\n\e[1;34mPor que usar esse script?
 
 Para o caso de ocorrer um problema;
 Um vírus raro pode atacar o sistema corrompendo alguns dados importantes; 
 Sua empresa ou você pode ser alvo de Ransomware;
-Pode falhar disco rígido (HDD) / SSD muito em breve.  
+Pode falhar disco rígido (HD) / SSD muito em breve.
 
-"
+\e[0m"
+
 
 # ==========================================================================================
 
@@ -3867,6 +3872,8 @@ NTFS partition /dev/sda6 was processed successfully.
 
 Hiren's Boot  (versão live do windows)
 
+
+Usar essa opção abaixo em caso de problema com  a clonagem de Windows.
 
 cmd
 
