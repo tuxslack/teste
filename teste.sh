@@ -215,10 +215,13 @@ partclone.chkimg
 gdisk
 xfce4-terminal
 pv
-cifs-utils
 smbclient
 yad
 xterm" > "$pacotes"
+
+
+# Não tem como verificar a instalação do pacote "cifs-utils" com comando which no Void Linux.
+
 
 
 # ou no laço while?
@@ -969,14 +972,15 @@ echo
 echo
 
 echo "
-Certifique-se de realizar backup de seus dados antes de qualquer operação de clonagem e restauração de sistema.
+Certifique-se de realizar backup de seus dados antes de qualquer 
+operação de clonagem e restauração de sistema.
 
 Por que usar esse script?
 
 Para o caso de ocorrer um problema;
 Um vírus raro pode atacar o Linux corrompendo alguns dados importantes; 
 Sua empresa ou você pode ser alvo de Ransomware;
-Pode falhar Disco rígido (HDD) / SSD muito em breve.  
+Pode falhar disco rígido (HDD) / SSD muito em breve.  
 
 "
 
