@@ -978,7 +978,7 @@ operação de clonagem e restauração de sistema.
 Por que usar esse script?
 
 Para o caso de ocorrer um problema;
-Um vírus raro pode atacar o Linux corrompendo alguns dados importantes; 
+Um vírus raro pode atacar o sistema corrompendo alguns dados importantes; 
 Sua empresa ou você pode ser alvo de Ransomware;
 Pode falhar disco rígido (HDD) / SSD muito em breve.  
 
