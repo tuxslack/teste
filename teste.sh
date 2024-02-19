@@ -3009,6 +3009,8 @@ if [ "$formato_da_tabela_de_particoes" == "dos" ];
    dos
    "
 
+sleep 2
+clear
 
 echo "
 Recuperando a tabela de partições para $HD...
@@ -3077,8 +3079,8 @@ clear
 
    elif [ $formato_da_tabela_de_particoes == "gpt" ];
    then
-   
-   
+
+
 
 echo "
 Restaurar o backup da tabela de partição (GPT) para discos $HD...
