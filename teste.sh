@@ -3899,7 +3899,7 @@ Usar essa opção abaixo em caso de problema com  a clonagem de Windows.
 
 cmd
 
-chkdsk d: /f
+chkdsk c: /f
 
 
 
