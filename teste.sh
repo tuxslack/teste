@@ -18,7 +18,7 @@
 # Clona a partição numa imagem junto com a MBR (.mbr) e tabela de partição (.sf) para uma futura restauração de imagem em um HD de mesma capacidade.
 
 
-
+# Clonagem e restauração de sistema
 # Clonar partições do HD no Linux
 # Realiza a clonagem de HD/SSD
 
@@ -3200,6 +3200,10 @@ array=("$local_da_imagem_da_particao"/*.gz.*)
 itens=$(ls -1 "$local_da_imagem_da_particao"/*.gz.* | wc -l)
 
 echo "
+Restauração de imagens para o $HD
+=========================================
+
+
 Arquivos de imagens localizados na pasta $local_da_imagem_da_particao
 "
 
