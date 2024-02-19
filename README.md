@@ -7,7 +7,7 @@ Clone este repositório ou baixe e descompacte o arquivo zip. <br> <br>
 
 
 ```sh
-$ git clone https://github.com/tuxslack/teste/teste.git
+$ git clone https://github.com/tuxslack/teste.git
 
 ```
 <br>
