@@ -61,6 +61,7 @@ Instalação: <br>
 > * umount
 > * date
 > * mkdir
+> * pv       (Para o comando dd mostrar uma barra de progresso no terminal)
  
 ## ISO do Linux em modo live usando o script: <br>
 ![](https://github.com/tuxslack/teste/blob/slackware/VirtualBox_windows%2010%20pro_13_02_2024_04_35_44.png)
