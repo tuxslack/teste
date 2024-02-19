@@ -2594,7 +2594,11 @@ echo "================================================"
 
 3) # Compartilhamento SAMBA (com ou sem senha)  - rede
 
-echo "Compartilhamento SAMBA..."
+clear
+
+echo "
+Compartilhamento SAMBA...
+"
 
 # Como montar pastas de rede compartilhadas no Linux
 
@@ -2712,11 +2716,17 @@ fi
 
 echo "================================================"
 ;;
+
+
 4) # Compartilhamento NFS (Network File System) - rede
 
 # Montando e conectando em um servidor NFS
 
-echo "Compartilhamento NFS..."
+clear
+
+echo "
+Compartilhamento NFS...
+"
 
 
 # Conectando ao servidor
@@ -2852,9 +2862,14 @@ fi
 
 sleep 5s
 echo "================================================"
+
 ;;
 
+
 5)
+
+clear
+
 echo "Saindo..."
 sleep 5s
 clear
@@ -2862,7 +2877,14 @@ exit
 ;;
 
 
-*) echo "Opção inválida!"
+*) 
+clear
+
+echo "
+Opção inválida!
+"
+sleep 1
+
 esac
 done
 
@@ -2907,7 +2929,7 @@ Local: $local_da_imagem_da_particao
 
 ls -1 $local_da_imagem_da_particao
 
-sleep 5
+sleep 2
 
 # ----------------------------------------------------------------------------------------
 
@@ -2968,6 +2990,8 @@ formato_da_tabela_de_particoes=$(cat "$local_da_imagem_da_particao"/fdisk.txt | 
    
 else
 
+clear
+
 echo "
 Sem suporte ao idioma: $LANG
 " | tee  "$log"
@@ -2978,13 +3002,22 @@ fi
 
 
 
-echo "Tipo de tabelas de partição da imagem:
+echo "
+Tipo de tabelas de partição da imagem:
 
 $formato_da_tabela_de_particoes
 "
 
+sleep 5
+clear
+
+
 
 else
+
+
+
+clear
 
 echo "
 O arquivo $local_da_imagem_da_particao/fdisk.txt não existe.
@@ -3005,6 +3038,7 @@ read formato_da_tabela_de_particoes
 
 if [ "$formato_da_tabela_de_particoes" == "dos" ];
    then
+   
    echo "
    dos
    "
@@ -3074,7 +3108,7 @@ Restaurar imagem usando o Partclone (split, gzip) com fonte stdin
 # ----------------------------------------------------------------------------------------
 
 
-sleep 1
+sleep 2
 clear
 
    elif [ $formato_da_tabela_de_particoes == "gpt" ];
