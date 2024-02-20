@@ -1288,10 +1288,29 @@ Placa-mãe:
 inxi -v7azy > "$local_da_imagem_da_particao"/inxi.txt
 
 
+echo "
+" >> "$local_da_imagem_da_particao"/inxi.txt
+
+inxi -Fxz >> "$local_da_imagem_da_particao"/inxi.txt
+
+
+echo "
+" >> "$local_da_imagem_da_particao"/inxi.txt
+
+inxi --admin --filter --cpu --machine >> "$local_da_imagem_da_particao"/inxi.txt
+
+
 # REFERÊNCIAS:
 
 # https://forum.manjaro.org/t/very-unstable-system/126455/25
 # https://sempreupdate.com.br/como-clonar-disco-usando-o-linux/
+# https://forums.opensuse.org/t/virtualbox-kernel-driver-no-loading-secureboot-enabled-how-to-sign-modules/146160/19
+
+
+
+echo "Módulos carregados:
+`lsmod`
+" > "$local_da_imagem_da_particao"/modulos_carregados.txt
 
 
 
@@ -1316,10 +1335,16 @@ Interpretando a leitura de logs de erros do dmesg:
 
 dmesg | grep -i "error\|warn\|fail" >> "$local_da_imagem_da_particao"/dmesg.txt
 
+# dmesg | grep failed
+
+# dmesg | egrep -i 'virtualbox|vbox'
+
+
 
 # REFERÊNCIAS:
 
 # https://forums.linuxmint.com/viewtopic.php?t=227444
+# https://forums.linuxmint.com/viewtopic.php?t=169388
 
 
 
