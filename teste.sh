@@ -70,6 +70,7 @@
 # https://www.tecmundo.com.br/sistema-operacional/113499-8-sistemas-operacionais-alternativos-windows-voce-precisa-conhecer.htm
 # https://canaltech.com.br/hardware/como-clonar-um-hd-para-um-ssd-211318/
 # https://www.avg.com/pt/signal/how-to-clone-a-hard-drive
+# https://clonezilla.org/
 
 
 
@@ -3987,7 +3988,11 @@ funcionar, mas é importante verificar a compatibilidade com o sistema de arquiv
 # MacOS
 
 # https://medium.com/@crp_underground/acelerando-comando-dd-no-macos-15e982d03f38
-
+# https://iboysoft.com/pt/como-fazer/software-de-clonagem-mac.html
+# https://macmagazine.com.br/post/2022/01/25/novo-clone-do-macos-promete-rodar-apps-do-sistema-da-apple/
+# https://airyx.org/
+# https://macmagazine.com.br/post/2021/07/22/como-atualizar-o-macos-sistema-operacional-dos-macs/
+# https://macmagazine.com.br/post/2017/03/31/apple-muda-a-recuperacao-do-macos-na-versao-10-12-4-e-facilita-as-coisas-para-quem-quer-reinstalar-o-sistema/
                 
             ;;
             
