@@ -18,6 +18,23 @@
 # Clona a partição numa imagem junto com a MBR (.mbr) e tabela de partição (.sf) para uma futura restauração de imagem em um HD de mesma capacidade.
 
 
+
+# Uma grande dificuldade de administradores de sistema é a perda de tempo quando o assunto é reinstalar o sistema. Quando temos várias 
+# máquinas com o mesmo hardware (ou parecido) podemos fazer a clonagem dos HD. Para este fim temos vários programas que fazem a clonagem, 
+# mas no geral só podem ser feitos abrindo as máquinas e colocando o HD a ser clonado. Este procedimento gera uma série de transtornos 
+# como ter que abrir as máquinas e algumas vezes o HD tem de ser iguais, sem contar que você só pode fazer uma máquina por vez.
+
+# O Ghost cria imagens compactadas e com isto você pode criar um HD clonado.  Com o Ghost podemos criar a imagem 
+# da máquina já montada e configurada e hospedá-la em um servidor FTP ou servidor SAMBA de forma compactada, possibilitando baixar pela rede montando em 
+# vários computadores ao mesmo tempo e de forma bastante rápida. O sistema monta imagem de HDs completos ou apenas partições. Pessoalmente 
+# prefiro a imagem do HD completo por causa da MBR que também é copiada desta forma. Você pode criar a imagem de um HD pequeno, assim se 
+# adapta a HDs maiores, mas nunca o contrário. O restante do HD você particiona depois para usar como disco de dados ou coisa parecida. 
+
+# Configurando o servidor
+
+# Para fazermos a clonagem dos HDs, precisamos de um servidor para armazenar elas e depois podermos baixar para os demais computadores. 
+
+
 # Clonagem e restauração de sistema
 # Clonar partições do HD no Linux
 # Realiza a clonagem de HD/SSD
@@ -71,6 +88,8 @@
 # https://canaltech.com.br/hardware/como-clonar-um-hd-para-um-ssd-211318/
 # https://www.avg.com/pt/signal/how-to-clone-a-hard-drive
 # https://clonezilla.org/
+# https://www.youtube.com/watch?v=IgOjDrfvLy4
+# https://www.vivaolinux.com.br/artigos/impressora.php?codigo=4566
 
 
 
@@ -150,7 +169,6 @@ verificar(){
 
 # ==========================================================================================
 
-# Falta resolver
 
 # Instalação automática de programas
 
@@ -165,6 +183,7 @@ verificar(){
 version=$(cat /etc/os-release | grep "PRETTY_NAME=" | cut -d= -f2 | sed 's/"//g')
 # Void Linux
 # Ubuntu 23.10
+
 
 
 # REFERÊNCIAS:
@@ -183,7 +202,9 @@ pacotes="/tmp/pacote.log"
 
 # No arquivo "systemrescue-11.00-amd64.iso" não tem os pacotes: yad e xterm
 
-echo "split
+echo "yad
+xterm
+split
 gparted
 gpart
 cfdisk
@@ -217,8 +238,9 @@ gdisk
 xfce4-terminal
 pv
 smbclient
-yad
-xterm" > "$pacotes"
+cryptsetup
+df" > "$pacotes"
+
 
 
 # Não tem como verificar a instalação do pacote "cifs-utils" com comando which no Void Linux.
@@ -236,6 +258,7 @@ xterm" > "$pacotes"
 
 
 # REFERÊNCIAS:
+
  
 # TestDisk - Um utilitário que suporta recuperação de partições perdidas em ambos MBR e GPT.
 
@@ -885,6 +908,7 @@ clear
 
 else
 
+
 /bin/echo -e "\e[1;31m!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\e[0m"
 /bin/echo -e "\e[1;31mSeu sistema não está executando o Void Linux.\e[0m"
 /bin/echo -e "\e[1;31mO script foi testado apenas no Void Linux...\e[0m"
@@ -1341,10 +1365,25 @@ dmesg | grep -i "error\|warn\|fail" >> "$local_da_imagem_da_particao"/dmesg.txt
 
 
 
+
+# Para verificar o espaço em uso e a quantidade disponível do disco. 
+
+echo "
+Exibe informações sobre espaço, livre e ocupado, das partições do sistema.
+
+" > "$local_da_imagem_da_particao"/discos_montados.txt
+
+df -h -T >> "$local_da_imagem_da_particao"/discos_montados.txt
+
+
+
+
 # REFERÊNCIAS:
 
 # https://forums.linuxmint.com/viewtopic.php?t=227444
 # https://forums.linuxmint.com/viewtopic.php?t=169388
+# https://www.vivaolinux.com.br/artigos/impressora.php?codigo=1566
+# https://guialinux.uniriotec.br/df/
 
 
 
@@ -1419,7 +1458,7 @@ O suporte SMART está: $(smartctl -i $ClonarParticao | grep -i "SMART support is
 
 # Opção para ser usada no VirtualBox:
 
-teste=$(smartctl -i  $ClonarParticao | grep -i "Device Model:" | cut -d":" -f2 | sed  "s/^[[:space:]]\+//g" | sed  "s/[[:space:]]$\+//g")
+teste=$(smartctl -i  "$ClonarParticao" | grep -i "Device Model:" | cut -d":" -f2 | sed  "s/^[[:space:]]\+//g" | sed  "s/[[:space:]]$\+//g")
 
 
 if [ "$teste" == "VBOX HARDDISK" ];
@@ -1438,7 +1477,7 @@ Saúde do HD/SSD
 "
 # smartctl -H  $ClonarParticao
 
-teste=$(smartctl -H  $ClonarParticao | cut -d: -f2 | sed  "s/[[:space:]]\+//g" | sed -n '5p')
+teste=$(smartctl -H  "$ClonarParticao" | cut -d: -f2 | sed  "s/[[:space:]]\+//g" | sed -n '5p')
 
  
 fi
@@ -1528,7 +1567,7 @@ clear
 
 # Para fazer o backup do MBR, basta copiar para um arquivo os primeiros 512 bytes do disco:
 
-dd if=$HD of=$local_da_imagem_da_particao/sda-mbr  bs=512 count=1  2>> "$log"
+dd if="$HD" of="$local_da_imagem_da_particao"/sda-mbr  bs=512 count=1  2>> "$log"
 
 
 # Este comando faz uma cópia do setor de boot do HD, aqueles primeiros 512 bytes de extrema importância onde fica instalado o gerenciador de boot.
@@ -1570,7 +1609,7 @@ clear
 
 nome_da_tabela_de_particao=$(echo "$HD" | cut -d/ -f3)
 
-sfdisk -d "$HD" > "$local_da_imagem_da_particao"/$nome_da_tabela_de_particao.sf  2>> "$log"
+sfdisk -d "$HD" > "$local_da_imagem_da_particao"/"$nome_da_tabela_de_particao".sf  2>> "$log"
 
 
 # Este segundo faz uma cópia da tabela de partição do HD. Se você restaurar estes dois arquivos num HD limpo, 
@@ -1592,7 +1631,7 @@ sfdisk -d "$HD" > "$local_da_imagem_da_particao"/$nome_da_tabela_de_particao.sf 
 
 
    
-   elif [ $formato_da_tabela_de_particoes == "gpt" ];
+   elif [ "$formato_da_tabela_de_particoes" == "gpt" ];
    then
    
    echo "
@@ -1668,6 +1707,7 @@ exit
 
 fi
 
+
 # REFERÊNCIAS:
 
 # https://www.vivaolinux.com.br/topico/Iniciantes-no-Linux/gpt-ou-mbr-1
@@ -1709,15 +1749,15 @@ if [ "$sistema_de_arquivo" == "btrfs" ];
    then
    echo "btrfs"
 
-   elif [ $sistema_de_arquivo == "ext2" ];
+   elif [ "$sistema_de_arquivo" == "ext2" ];
    then
    echo "ext2"
 
-   elif [ $sistema_de_arquivo == "ext3" ];
+   elif [ "$sistema_de_arquivo" == "ext3" ];
    then
    echo "ext3"
    
-   elif [ $sistema_de_arquivo == "ext4" ];
+   elif [ "$sistema_de_arquivo" == "ext4" ];
    then
    echo "ext4"
 
@@ -1765,48 +1805,48 @@ if [ "$sistema_de_arquivo" == "btrfs" ];
 
 
 
-   elif [ $sistema_de_arquivo == "hfs+" ];
+   elif [ "$sistema_de_arquivo" == "hfs+" ];
    then
    echo "hfs+"
    
-   elif [ $sistema_de_arquivo == "extfs" ];
+   elif [ "$sistema_de_arquivo" == "extfs" ];
    then
    echo "extfs"
 
-   elif [ $sistema_de_arquivo == "exfat" ];
+   elif [ "$sistema_de_arquivo" == "exfat" ];
    then
    echo "exfat"
    
-   elif [ $sistema_de_arquivo == "f2fs" ];
+   elif [ "$sistema_de_arquivo" == "f2fs" ];
    then
    echo "f2fs"
    
-   elif [ $sistema_de_arquivo == "nilfs2" ];
+   elif [ "$sistema_de_arquivo" == "nilfs2" ];
    then
    echo "nilfs2"            
 
 
-   elif [ $sistema_de_arquivo == "fat" ];
+   elif [ "$sistema_de_arquivo" == "fat" ];
    then
    echo "fat"
 
-   elif [ $sistema_de_arquivo == "fat12" ];
+   elif [ "$sistema_de_arquivo" == "fat12" ];
    then
    echo "fat12"
    
-   elif [ $sistema_de_arquivo == "fat16" ];
+   elif [ "$sistema_de_arquivo" == "fat16" ];
    then
    echo "fat16"
    
-   elif [ $sistema_de_arquivo == "fat32" ];
+   elif [ "$sistema_de_arquivo" == "fat32" ];
    then
    echo "fat32"
    
-   elif [ $sistema_de_arquivo == "vfat" ];
+   elif [ "$sistema_de_arquivo" == "vfat" ];
    then
    echo "vfat"
 
-   elif [ $sistema_de_arquivo == "ntfs" ];
+   elif [ "$sistema_de_arquivo" == "ntfs" ];
    then
    echo "ntfs"
    
@@ -1829,11 +1869,11 @@ if [ "$sistema_de_arquivo" == "btrfs" ];
 
  
     
-   elif [ $sistema_de_arquivo == "hfsplus" ];
+   elif [ "$sistema_de_arquivo" == "hfsplus" ];
    then
    echo "hfsplus"
    
-   elif [ $sistema_de_arquivo == "hfsp" ];
+   elif [ "$sistema_de_arquivo" == "hfsp" ];
    then
    echo "hfsp"   
    
@@ -1913,7 +1953,7 @@ umount "$ClonarParticao"  1> /dev/null  2>> "$log"
    partclone."$sistema_de_arquivo" -z 10485760 -N  -L /var/log/partclone.log -c -s "$ClonarParticao" --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - "$local_da_imagem_da_particao"/$(echo "$ClonarParticao" | cut -d/ -f3)."$sistema_de_arquivo"-ptcl-img.gz. 2>> "$log"
  
 
-# Obs: O Partclone adiciona o .000 por padrão, se a imagem for maior ficará .001, 002.
+# Obs: O Partclone adiciona o .000 por padrão, se a imagem for maior ficará .001, .002, .003, ...
 
 
 # REFERÊNCIAS:
@@ -2012,6 +2052,7 @@ Copiando o arquivo de log gerado para a pasta $local_da_imagem_da_particao
 rsync -av /var/log/partclone.log "$local_da_imagem_da_particao"/   2>> "$log"
 
 
+
 # REFERÊNCIAS:
 
 # https://sobrelinux.info/questions/163716/whats-the-difference-between-cp-and-rsync
@@ -2021,6 +2062,7 @@ rsync -av /var/log/partclone.log "$local_da_imagem_da_particao"/   2>> "$log"
 # Copia o arquivo de log para a pasta "$local_da_imagem_da_particao"
 
 rsync -av "$log"  "$local_da_imagem_da_particao"
+
 
 
 # REFERÊNCIAS:
@@ -2143,7 +2185,7 @@ verificar
 # locale -a
 
 
-if [ $LANG == "pt_BR.UTF-8" ]; then
+if [ "$LANG" == "pt_BR.UTF-8" ]; then
 
 echo "
 Idioma do sistema: $LANG
@@ -2159,7 +2201,7 @@ dispositivos_localizados=$(fdisk -l | grep /dev/sd | grep Disco | awk '{print $2
 # /dev/sdb
 
 
-elif [ $LANG == "en_US.UTF-8" ];then
+elif [ "$LANG" == "en_US.UTF-8" ];then
 
 echo "
 System language: $LANG
@@ -2309,6 +2351,7 @@ clear
 
 case "$x" in
 
+
 1) # Pasta local
 
 read -p "Informe o caminho completo da pasta onde esta a imagem: " local_da_imagem_da_particao
@@ -2319,13 +2362,16 @@ read -p "Informe o caminho completo da pasta onde esta a imagem: " local_da_imag
 [ -z "$local_da_imagem_da_particao" ] && { echo "O valor não pode ser nulo... Informe a pasta onde estão os arquivos de imagem do sistema." ; exit ; }
 
 
-echo "Local: $local_da_imagem_da_particao"
+echo "
+Local: $local_da_imagem_da_particao
+"
 
 break
 
 sleep 5s
 echo "================================================"
 ;;
+
 
 2) # Dispositivo de armazenamento (USB, HD ou SSD)
 
@@ -2507,14 +2553,20 @@ if [ $? -eq 0 ]; then
  
 local_da_imagem_da_particao=$(echo $ponto_de_montagem)
 
-echo "Local: $local_da_imagem_da_particao"
 
 echo "
+
+Local: $local_da_imagem_da_particao
+
 Conteudo da pasta:
 "
+
 ls -1 "$local_da_imagem_da_particao"
 
+
+
 break
+
 
 else
 
@@ -2688,7 +2740,10 @@ ping -c 5 $ip
 
 if [ $? -eq 0 ]; then
 
-echo "Com acesso ao servidor $ip"
+echo "
+O servidor $ip esta na rede...
+"
+
 sleep 2
 
 else
@@ -2769,9 +2824,19 @@ read -n1 MCONFIRMA
       
       echo "Prosseguindo..."
       
+      sleep 2
+      clear
+      
       # Compartilhamento SAMBA com senha
+      
+      echo "Qual o nome do usuário para acessar o compartilhamento $compartilhamento no servidor $ip?"
+      read nome_do_usuario
+      
+      echo "Qual a senha do compartilhamento $compartilhamento no servidor $ip?"
+      read senha
+      
  
-      mount -t cifs //"$ip"/"$compartilhamento" "$ponto_de_montagem" -o user="$nome_do_usuario", password="$senha" 
+      mount -t cifs //"$ip"/"$compartilhamento" "$ponto_de_montagem" -o user="$nome_do_usuario", password="$senha"  2>> "$log"
       
       
       else
@@ -2781,7 +2846,7 @@ read -n1 MCONFIRMA
       
      # Compartilhamento SAMBA sem senha
 
-      mount -t cifs //"$ip"/"$compartilhamento" "$ponto_de_montagem" -o guest 
+      mount -t cifs //"$ip"/"$compartilhamento" "$ponto_de_montagem" -o guest  2>> "$log"
 
       
      #  echo "encerrando script, teclou $MCONFIRMA"
@@ -2927,7 +2992,7 @@ umount "$ponto_de_montagem" 2>> "$log"
 
 clear
 
-mount -t nfs "$ip":"$compartilhamento" "$ponto_de_montagem"
+mount -t nfs "$ip":"$compartilhamento" "$ponto_de_montagem"   2>> "$log"
 
 if [ $? -eq 0 ]; then
  
@@ -3043,7 +3108,7 @@ echo "
 Local: $local_da_imagem_da_particao
 "
 
-ls -1 $local_da_imagem_da_particao
+ls -1 $local_da_imagem_da_particao  2>> "$log"
 
 sleep 2
 
@@ -3083,7 +3148,7 @@ O arquivo $local_da_imagem_da_particao/fdisk.txt existe.
 # locale -a
 
 
-if [ $LANG == "pt_BR.UTF-8" ]; then
+if [ "$LANG" == "pt_BR.UTF-8" ]; then
 
 echo "
 Idioma do sistema: $LANG
@@ -3094,7 +3159,7 @@ Idioma do sistema: $LANG
 formato_da_tabela_de_particoes=$(cat "$local_da_imagem_da_particao"/fdisk.txt | grep "Tipo de rótulo do disco:" | cut -d: -f2  | sed 's/ //g')
 
 
-elif [ $LANG == "en_US.UTF-8" ];then
+elif [ "$LANG" == "en_US.UTF-8" ];then
 
 echo "
 System language: $LANG
@@ -3227,7 +3292,7 @@ Restaurar imagem usando o Partclone (split, gzip) com fonte stdin
 sleep 2
 clear
 
-   elif [ $formato_da_tabela_de_particoes == "gpt" ];
+   elif [ "$formato_da_tabela_de_particoes" == "gpt" ];
    then
 
 
@@ -3352,6 +3417,7 @@ clear
 if [[ $opcao -eq 100 ]]; then
 
 clear
+
 break
 
 fi
