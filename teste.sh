@@ -15,6 +15,32 @@
 # partclone - O utilitário para clonar e restaurar uma partição.
 #
 
+
+
+# backup e a restauração
+
+# Funciona com máquinas reais e virtuais
+
+
+# Recupere-se de qualquer coisa
+
+# Quando ocorre um desastre, o esse script restaura seu sistema às condições perfeitas em minutos, superando:
+
+
+# Dano
+
+# Programas maliciosos (Malware...)
+
+# Eliminação
+
+# Cracker
+
+# Erros
+
+# Má sorte
+
+
+
 # Clona a partição numa imagem junto com a MBR (.mbr) e tabela de partição (.sf) para uma futura restauração de imagem em um HD de mesma capacidade.
 
 
@@ -90,6 +116,7 @@
 # https://clonezilla.org/
 # https://www.youtube.com/watch?v=IgOjDrfvLy4
 # https://www.vivaolinux.com.br/artigos/impressora.php?codigo=4566
+# https://unix.stackexchange.com/questions/399188/failed-to-use-partclone-program-to-save-or-restore-an-image
 
 
 
