@@ -4,6 +4,19 @@
 ################################################################
 #
 # Script_Name: ypartclone.sh
+# Date: 
+# written by: Fernando
+# Web Site:
+#
+#
+# History : 0.2 - Added Logic for Ubuntu 17.10 and 18.04 detection 
+#               - Updated the polkit section
+#               - New formatting and structure  
+#           0.1 - Initial Script       
+# Disclaimer : Script provided AS IS. Use it at your own risk....
+#
+# Relate bugs para  thomas@nchc.org.tw ou http://partclone.org (Yu-Chin Tsai)
+#
 #
 # Description: Eu preciso de uma ferramenta que eu possa criar uma imagem de partição do sistema instalado de modo que eu possa usá-la em outro HD em outra Máquina.
 # Norton Ghost, Acronis True Image, Macrium Reflect.
@@ -75,17 +88,6 @@
 # Variedade de formatos suportados, eles incluem: ext2, ext3, ext4, hfs +, reiserfs, reiser4, btrfs, vmfs3, vmfs5, 
 # xfs, jfs, ufs, ntfs, fat (12/16/32), exfat, f2fs e nilfs.
 #
-# Date: 
-# written by: Fernando
-# Web Site:
-# Version : 0.2
-# History : 0.2 - Added Logic for Ubuntu 17.10 and 18.04 detection 
-#               - Updated the polkit section
-#               - New formatting and structure  
-#           0.1 - Initial Script       
-# Disclaimer : Script provided AS IS. Use it at your own risk....
-#
-# Relate bugs para  thomas@nchc.org.tw ou http://partclone.org (Yu-Chin Tsai)
 #
 ##################################################################
 
@@ -175,7 +177,10 @@ log="/tmp/partclone.log"
 
 
 descricao="Script de manutenção de sistema"
-versao="versão 0.2"
+
+# Versão:
+versao="0.2"
+
 autor="Fernando Souza"
 data="Janeiro de 2024"
 # site1="YouTube - @fernandosuporte"
@@ -266,7 +271,8 @@ xfce4-terminal
 pv
 smbclient
 cryptsetup
-df" > "$pacotes"
+df
+less" > "$pacotes"
 
 
 
@@ -1010,7 +1016,7 @@ Precauções:
 
 # Verificar Root
 
-if ! [ $(id -u) = 0 ]; then echo "Por favor, execute este script como SUDO ou ROOT!" && yad --title="" --on-top --center --timeout=30 --text="Por favor, execute este script como SUDO ou ROOT!"  ; exit ; fi
+# if ! [ $(id -u) = 0 ]; then echo "Por favor, execute este script como SUDO ou ROOT!" && yad --title="" --on-top --center --timeout=30 --text="Por favor, execute este script como SUDO ou ROOT!"  ; exit ; fi
 
 
 # ==========================================================================================
@@ -1018,11 +1024,11 @@ if ! [ $(id -u) = 0 ]; then echo "Por favor, execute este script como SUDO ou RO
 
 
 echo -e "\n\e[1;34m
-#----------------------------------------------------#
-#   $descricao - $versao     #
-#   Escrito por $autor - $data     #
-#   $site  #
-#----------------------------------------------------#
+#----------------------------------------------------------#
+#   $descricao - versão $versao           #
+#   Escrito por $autor - $data           #
+#   $site        #
+#----------------------------------------------------------#
 \e[0m"
 
 
@@ -3860,14 +3866,14 @@ sed -i '1,6d' /tmp/ajuda.log
 # isso faz com que o sed interprete o "/" como o delimitador ao invés de velo como um caractere de texto.
 
 
-sed -i "1s/^/                                                                                                                     \n/"  /tmp/ajuda.log
-sed -i "2s/^/           #--------------------------------------------------------------------------------------------------------#\n/"  /tmp/ajuda.log
-sed -i "3s/^/           #                                                                                                        #\n/"  /tmp/ajuda.log
-sed -i "4s/^/           #                               $descricao - $versao                             #\n/"  /tmp/ajuda.log
-sed -i "5s/^/           #                               Escrito por $autor - $data                             #\n/"  /tmp/ajuda.log
-sed -i "6s|^|           #                               $site                          #\n |"  /tmp/ajuda.log
-sed -i "7s/^/           #                                                                                                        #\n/"  /tmp/ajuda.log
-sed -i "8s/^/           #--------------------------------------------------------------------------------------------------------#\n/"  /tmp/ajuda.log
+sed -i "1s/^/                                                                                                                           \n/"  /tmp/ajuda.log
+sed -i "2s/^/           #--------------------------------------------------------------------------------------------------------------#\n/"  /tmp/ajuda.log
+sed -i "3s/^/           #                                                                                                              #\n/"  /tmp/ajuda.log
+sed -i "4s/^/           #                               $descricao - versão $versao                                   #\n/"  /tmp/ajuda.log
+sed -i "5s/^/           #                               Escrito por $autor - $data                                   #\n/"  /tmp/ajuda.log
+sed -i "6s|^|           #                               $site                                #\n |"  /tmp/ajuda.log
+sed -i "7s/^/           #                                                                                                              #\n/"  /tmp/ajuda.log
+sed -i "8s/^/           #--------------------------------------------------------------------------------------------------------------#\n/"  /tmp/ajuda.log
 
 
 # Substitui a palavra "$descricao" pelo conteudo da variavel $descricao somente na linha 6
@@ -3940,14 +3946,25 @@ clear
         
                     
         --ajuda|--help|-h)
+
+echo "
+Carregando o manual de ajuda...
+"
+sleep 40
+clear
+
         
-          echo "
+
+echo "
+
                 Use: $0 --clonar|-c           para clonar HD;
                 Use: $0 --restaurar|-r        para restaurar uma imagem do sistema para o HD;
                 Use: $0 --gui                 Abre o script usando o Yad.                  
                 Use: $0 --ajuda|--help|-h     mostra essa tela.                    
-                "
-echo "
+
+
+     ***  Para move esse manual de ajuda para cima e para baixo use as setas do teclado (Seta para cima e Seta para baixo) ***
+
 
 Preparando o HD
 ===============
@@ -4104,6 +4121,45 @@ possuem arquivos modificados que podem conter vírus e outros arquivos malicioso
   *   Anydesk                   (Acesso remoto)
   *   Driver da impressora
   
+  
+Customizar Windows:
+
+  - Instalar programas da sua preferência 
+  - Instalar Drivers (impressora...)
+  - Adicionar papeis de parede
+  - Desativar ou ativar serviços 
+  - Adicionar novas atualizações
+  - Retira a coleta de dados da Microsoft
+  - Retira tudo que consome recursos demais
+  
+  
+  
+Customizar Linux:
+
+  - Instalar ambiente gráfico (XFCE, OpenBox, Fluxbox)
+  - Definir o tema padrão
+  - Instalar programas da sua preferência 
+  - Adicionar scripts 
+  - Adicionar alias
+  - Adicionar papeis de parede
+  - Temas de janela
+  - Temas de ícones
+ 
+  
+Ex: 
+
+$ du -hs slax-64bit-slackware-15.0.4.iso 
+455M	slax-64bit-slackware-15.0.4.iso
+
+https://www.slax.org/
+
+
+$ du -hs systemrescue-11.00-amd64.iso 
+854M	systemrescue-11.00-amd64.iso
+
+https://www.system-rescue.org/Download/
+
+
 
 A imagem gerada deve ser a minimalista possível. O básico do básico...
   
@@ -4111,7 +4167,10 @@ A imagem gerada deve ser a minimalista possível. O básico do básico...
 Nunca clonei um sistema macOS usando Linux, mas é possível fazer isso com o dd. O partclone também pode 
 funcionar, mas é importante verificar a compatibilidade com o sistema de arquivos do macOS.
  
-"
+ 
+                      Para sair desta tela use a tecla 'q' do teclado.
+"  | less
+
 
 # REFERÊNCIAS:
 
@@ -4121,6 +4180,7 @@ funcionar, mas é importante verificar a compatibilidade com o sistema de arquiv
 # https://www.dz-techs.com/pt/methods-to-clone-your-linux-hard-drive/
 # https://eduardomozartdeoliveira.wordpress.com/2018/08/22/clonando-um-hdd-ssd-maior-para-um-hdd-sdd-menor/
 # https://caixaseca.blogspot.com/2011/09/personalizando-o-clonezilla-live.html
+# https://linuxdicasesuporte.blogspot.com/2022/02/customizar-sua-remasterizacao-debian.html?m=0
 
 
 
