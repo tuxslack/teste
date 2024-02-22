@@ -3616,7 +3616,7 @@ clear
 
 # cat "$local_da_imagem_da_particao"/$imagem* | gunzip -c | partclone."$sistema_de_arquivo" -d -r -s -N  -L /var/log/partclone.log - -o "$HD"$numero_da_particao   2>> "$log"
 
-cat "$local_da_imagem_da_particao"/$imagem* | gunzip -d -c | partclone.restore -N -F -L /var/log/partclone.log -O "$HD"$numero_da_particao   # 2>> "$log"
+cat "$local_da_imagem_da_particao"/$imagem | gunzip -d -c | partclone.restore -N -F -L /var/log/partclone.log -O "$HD"$numero_da_particao   # 2>> "$log"
 
 
 # Agora é só aguardar para uma imagem de 650MB, a restauração demora cerca de 5 minutos dependendo do seu hardware. 
