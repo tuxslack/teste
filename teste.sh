@@ -3614,9 +3614,12 @@ fi
 clear
 
 
-# cat "$local_da_imagem_da_particao"/$imagem* | gunzip -c | partclone."$sistema_de_arquivo" -d -r -s -N  -L /var/log/partclone.log - -o "$HD"$numero_da_particao   2>> "$log"
+cat "$local_da_imagem_da_particao"/$imagem* | gunzip -c | partclone."$sistema_de_arquivo" -d -r -s -N  -L /var/log/partclone.log - -o "$HD"$numero_da_particao   # 2>> "$log"
 
-cat "$local_da_imagem_da_particao"/$imagem | gunzip -d -c | partclone.restore -N -F -L /var/log/partclone.log -O "$HD"$numero_da_particao   # 2>> "$log"
+
+# Esta gerando erro "gzip: stdin: unexpected end of file (arquivo com defeito ou pode apenas ser o comando passado da maneira errada, que comando vc utilizou para extrair os dados)
+
+# cat "$local_da_imagem_da_particao"/$imagem* | gunzip -d -c | partclone.restore -N -F -L /var/log/partclone.log -O "$HD"$numero_da_particao   # 2>> "$log"
 
 
 # Agora é só aguardar para uma imagem de 650MB, a restauração demora cerca de 5 minutos dependendo do seu hardware. 
@@ -3631,6 +3634,7 @@ cat "$local_da_imagem_da_particao"/$imagem | gunzip -d -c | partclone.restore -N
 # https://pt.stackoverflow.com/questions/311679/como-comparar-o-valor-de-uma-vari%C3%A1vel-com-uma-string-no-shell-script
 # https://www.campuscode.com.br/conteudos/shell-script-basico-de-controle-de-fluxo
 # https://gist.github.com/saltlakeryan/4aa49f19a40b83a1a7d2
+# https://under-linux.org/showthread.php?t=68247
 
 
 
