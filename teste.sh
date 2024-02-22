@@ -983,7 +983,7 @@ Precauções:
 
 # Verificar Root
 
-# if ! [ $(id -u) = 0 ]; then echo "Por favor, execute este script como SUDO ou ROOT!" && yad --title="" --on-top --center --timeout=30 --text="Por favor, execute este script como SUDO ou ROOT!"  ; exit ; fi
+if ! [ $(id -u) = 0 ]; then echo "Por favor, execute este script como SUDO ou ROOT!" && yad --title="" --on-top --center --timeout=30 --text="Por favor, execute este script como SUDO ou ROOT!"  ; exit ; fi
 
 
 # ==========================================================================================
@@ -3228,7 +3228,7 @@ sleep 2
 clear
 
 echo "
-Recuperando a tabela de partições para $HD...
+Restaurando a tabela de partições para $HD...
 "
 
 sleep 5
@@ -3252,9 +3252,11 @@ sfdisk –force "$HD" < "$local_da_imagem_da_particao"/sda.sf  2>> "$log"
 
 
 
+
 echo "
-Restaurar o MBR no $HD...
+Restaurando o MBR no $HD...
 "
+
 
 sleep 5
 clear
@@ -3570,13 +3572,19 @@ fi
 
 
 # Puxa a imagem para o HD
+# Faça a restauração
 
 clear
 
-cat "$local_da_imagem_da_particao"/$imagem* | gunzip -c | partclone."$sistema_de_arquivo" -d -r -s -N  -L /var/log/partclone.log - -o "$HD"$numero_da_particao   2>> "$log"
+
+# cat "$local_da_imagem_da_particao"/$imagem* | gunzip -c | partclone."$sistema_de_arquivo" -d -r -s -N  -L /var/log/partclone.log - -o "$HD"$numero_da_particao   2>> "$log"
+
+cat "$local_da_imagem_da_particao"/$imagem* | gunzip -d -c | partclone.restore -N -F -L /var/log/partclone.log -O "$HD"$numero_da_particao   2>> "$log"
 
 
 # Agora é só aguardar para uma imagem de 650MB, a restauração demora cerca de 5 minutos dependendo do seu hardware. 
+
+
 
 
 # REFERÊNCIAS:
@@ -3585,8 +3593,10 @@ cat "$local_da_imagem_da_particao"/$imagem* | gunzip -c | partclone."$sistema_de
 # http://blog.evaldojunior.com.br/aulas/blog/shell%20script/2011/05/08/shell-script-parte-2-controle-de-fluxo.html
 # https://pt.stackoverflow.com/questions/311679/como-comparar-o-valor-de-uma-vari%C3%A1vel-com-uma-string-no-shell-script
 # https://www.campuscode.com.br/conteudos/shell-script-basico-de-controle-de-fluxo
-                  
-                  
+# https://gist.github.com/saltlakeryan/4aa49f19a40b83a1a7d2
+
+
+
                   
 	 else
 	        
@@ -4053,6 +4063,8 @@ possuem arquivos modificados que podem conter vírus e outros arquivos malicioso
   *   Anydesk                   (Acesso remoto)
   *   Driver da impressora
   
+
+A imagem gerada deve ser a minimalista possível. O básico do básico...
   
 
 Nunca clonei um sistema macOS usando Linux, mas é possível fazer isso com o dd. O partclone também pode 
