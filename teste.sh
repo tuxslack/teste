@@ -1977,7 +1977,7 @@ umount "$ClonarParticao"  1> /dev/null  2>> "$log"
 
 # Clonar uma partição para uma imagem
    
-   partclone."$sistema_de_arquivo" -z 10485760 -N  -L /var/log/partclone.log -c -s "$ClonarParticao" --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - "$local_da_imagem_da_particao"/$(echo "$ClonarParticao" | cut -d/ -f3)."$sistema_de_arquivo"-ptcl-img.gz. 2>> "$log"
+   partclone."$sistema_de_arquivo" -z 10485760 -N  -L /var/log/partclone.log -c -s "$ClonarParticao" --output - | pigz -c --fast -b 1024 -p 16 | split -b 2000m - "$local_da_imagem_da_particao"/$(echo "$ClonarParticao" | cut -d/ -f3)."$sistema_de_arquivo"-ptcl-img.gz.  2>> "$log"
  
 
 # Obs: O Partclone adiciona o .000 por padrão, se a imagem for maior ficará .001, .002, .003, ...
@@ -3118,26 +3118,26 @@ clear
 
 # ----------------------------------------------------------------------------------------
 
-clear
+# clear
 
-ls -1 $local_da_imagem_da_particao
+# ls -1 $local_da_imagem_da_particao
 
-read -p "
-Informe o caminho completo da pasta onde esta a imagem: " local_da_imagem_da_particao
+# read -p "
+# Informe o caminho completo da pasta onde esta a imagem: " local_da_imagem_da_particao
 
 
 # Verificar se a variavel $local_da_imagem_da_particao é nula
 
-[ -z "$local_da_imagem_da_particao" ] && { echo "O valor não pode ser nulo... Informe a pasta onde estão os arquivos de imagem do sistema." ; exit ; }
+# [ -z "$local_da_imagem_da_particao" ] && { echo "O valor não pode ser nulo... Informe a pasta onde estão os arquivos de imagem do sistema." ; exit ; }
 
 
-echo "
-Local: $local_da_imagem_da_particao
-"
+# echo "
+# Local: $local_da_imagem_da_particao
+# "
 
-ls -1 $local_da_imagem_da_particao  2>> "$log"
+# ls -1 $local_da_imagem_da_particao  2>> "$log"
 
-sleep 2
+# sleep 2
 
 # ----------------------------------------------------------------------------------------
 
@@ -3193,7 +3193,7 @@ System language: $LANG
 "
   
 # US
-formato_da_tabela_de_particoes=$(cat "$local_da_imagem_da_particao"/fdisk.txt | grep "Disk label type:" | cut -d: -f2  | sed 's/ //g')
+formato_da_tabela_de_particoes=$(cat "$local_da_imagem_da_particao"/fdisk.txt | grep "Disklabel type:" | cut -d: -f2  | sed 's/ //g')
 
    
 else
@@ -3209,15 +3209,17 @@ Sem suporte ao idioma: $LANG
 fi
 
 
+clear
 
 echo "
 Tipo de tabelas de partição da imagem:
 
 $formato_da_tabela_de_particoes
+
 "
 
-sleep 5
-clear
+# sleep 5
+# clear
 
 
 
@@ -3246,12 +3248,14 @@ read formato_da_tabela_de_particoes
 
 if [ "$formato_da_tabela_de_particoes" == "dos" ];
    then
+
+clear
    
    echo "
    dos
    "
 
-sleep 2
+sleep 1
 clear
 
 echo "
@@ -3325,6 +3329,7 @@ clear
    then
 
 
+clear
 
 echo "
 Restaurar o backup da tabela de partição (GPT) para discos $HD...
@@ -3377,6 +3382,8 @@ sgdisk --load-backup="$local_da_imagem_da_particao"/gpt.backup  "$HD"  2>> "$log
 # ----------------------------------------------------------------------------------------
 
 
+clear
+
 
   else
   
@@ -3407,7 +3414,7 @@ array=("$local_da_imagem_da_particao"/*.gz.*)
 
 # Ver a quantidade de arquivos .gz na pasta $local_da_imagem_da_particao
 
-itens=$(ls -1 "$local_da_imagem_da_particao"/*.gz.* | wc -l)
+itens=$(ls -1 "$local_da_imagem_da_particao"/*.gz.aa* | wc -l)
 
 echo "
 Restauração de imagens para o $HD
@@ -3436,6 +3443,9 @@ done
 # Solicitar a opção do usuário
 
 echo "
+
+Use as numerações que finalizam os nomes dos arquivos com .aa
+
 Digite o número da opção desejada (100 para sair): " 
 read opcao
 
@@ -3491,7 +3501,7 @@ Partição a ser restaurada:       $HD$numero_da_particao
 
 Comando que vai ser executado na próxima etapa:
 
-cat $local_da_imagem_da_particao/$imagem* | gunzip -c | partclone.$sistema_de_arquivo -L /var/log/partclone.log  -d -r -s -N - -o $HD$numero_da_particao   2>> $log
+cat "$local_da_imagem_da_particao"/$imagem* | gunzip -d -c | partclone.restore -N -F -L /var/log/partclone.log -O "$HD"$numero_da_particao   2>> "$log"
 
 "
 read resposta
@@ -3606,7 +3616,7 @@ clear
 
 # cat "$local_da_imagem_da_particao"/$imagem* | gunzip -c | partclone."$sistema_de_arquivo" -d -r -s -N  -L /var/log/partclone.log - -o "$HD"$numero_da_particao   2>> "$log"
 
-cat "$local_da_imagem_da_particao"/$imagem* | gunzip -d -c | partclone.restore -N -F -L /var/log/partclone.log -O "$HD"$numero_da_particao   2>> "$log"
+cat "$local_da_imagem_da_particao"/$imagem* | gunzip -d -c | partclone.restore -N -F -L /var/log/partclone.log -O "$HD"$numero_da_particao   # 2>> "$log"
 
 
 # Agora é só aguardar para uma imagem de 650MB, a restauração demora cerca de 5 minutos dependendo do seu hardware. 
