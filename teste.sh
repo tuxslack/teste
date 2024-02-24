@@ -119,6 +119,7 @@
 # https://www.youtube.com/watch?v=IgOjDrfvLy4
 # https://www.vivaolinux.com.br/artigos/impressora.php?codigo=4566
 # https://unix.stackexchange.com/questions/399188/failed-to-use-partclone-program-to-save-or-restore-an-image
+# https://puppylinux-woof-ce.github.io/
 
 
 
@@ -1335,10 +1336,17 @@ Placa-mãe:
 " > "$local_da_imagem_da_particao"/dados.txt
 
 
+
 # REFERÊNCIAS:
 
 # https://sempreupdate.com.br/maneiras-de-exibir-detalhes-do-processador-no-terminal-linux/
 # https://www.vivaolinux.com.br/dica/Como-verificar-o-TIPO-e-o-TAMANHO-da-memoria-RAM-no-Linux-com-bonus
+
+
+
+# Placa de video
+
+inxi -G > "$local_da_imagem_da_particao"/placa-de-video.txt
 
 
 
@@ -1362,6 +1370,8 @@ inxi --admin --filter --cpu --machine >> "$local_da_imagem_da_particao"/inxi.txt
 # https://forum.manjaro.org/t/very-unstable-system/126455/25
 # https://sempreupdate.com.br/como-clonar-disco-usando-o-linux/
 # https://forums.opensuse.org/t/virtualbox-kernel-driver-no-loading-secureboot-enabled-how-to-sign-modules/146160/19
+# https://www.pclinuxos.com/forum/index.php?topic=156670.0
+
 
 
 
@@ -4152,6 +4162,20 @@ $ du -hs slax-64bit-slackware-15.0.4.iso
 455M	slax-64bit-slackware-15.0.4.iso
 
 https://www.slax.org/
+
+
+Salix64 Xfce 15.0 (x86_64, 64-bit)
+
+(size: 1.4GB, md5: 46121e56e3e5621d6b905ab53ed9ce8d)
+
+
+SalixLive64 Xfce 15.0 (x86_64, 64-bit)
+
+(size: 1.7GB, md5: 5400d0833f56e5abcb2fb7999795ef87) 
+
+
+https://www.salixos.org/download.html
+
 
 
 $ du -hs systemrescue-11.00-amd64.iso 
